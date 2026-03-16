@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using TodoApi.Models;
+using TodoApi.Models.DTO;
 
 namespace TodoApi.Controllers
 {
@@ -13,28 +16,36 @@ namespace TodoApi.Controllers
     [ApiController]
     public class TodoItemsController : ControllerBase
     {
-        private readonly TodoContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public TodoItemsController(TodoContext context)
+        public TodoItemsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
         // GET: api/TodoItems
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems([FromQuery(Name = "IsCompleted")] bool? IsComplete)
         {
+            var UserId = User.FindFirstValue("id");
+
+            if (UserId == null)
+                return Unauthorized();
+
             if (IsComplete == null)
-                return await _context.TodoItems.ToListAsync();
+                return await _context.TodoItems.Where(x => x.UserId == UserId).ToListAsync();
             else
-                return await _context.TodoItems.Where(x => x.IsComplete == IsComplete).ToListAsync();
+                return await _context.TodoItems.Where(x => x.IsComplete == IsComplete && x.UserId == UserId).ToListAsync();
         }
 
         // GET: api/TodoItems/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
         {
-            var todoItem = await _context.TodoItems.FindAsync(id);
+            var UserId = User.FindFirstValue("id");
+            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
 
             if (todoItem == null)
             {
@@ -44,12 +55,15 @@ namespace TodoApi.Controllers
             return todoItem;
         }
 
-        [HttpPost("toggle/{id}")]
         
+
         // POST api/toggle/5
+        [Authorize]
+        [HttpPost("toggle/{id}")]
         public async Task<ActionResult<TodoItem>> ToggleItem(long id)
         {
-            var todoItem = await _context.TodoItems.FindAsync(id);
+            var UserId = User.FindFirstValue("id");
+            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
 
             if (todoItem == null)
                 return NotFound();
@@ -79,13 +93,18 @@ namespace TodoApi.Controllers
 
         // PUT: api/TodoItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
+        public async Task<IActionResult> PutTodoItem(long id, TodoItemCreateDTO dto)
         {
-            if (id != todoItem.Id)
-            {
+            var UserId = User.FindFirstValue("id");
+            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
+
+            if (todoItem == null)
                 return BadRequest();
-            }
+
+            todoItem.Name = dto.Name;
+            todoItem.IsComplete = dto.IsComplete;
 
             _context.Entry(todoItem).State = EntityState.Modified;
 
@@ -110,21 +129,38 @@ namespace TodoApi.Controllers
 
         // POST: api/TodoItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
+        public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItemCreateDTO dto)
         {
+            var UserId = User.FindFirstValue("id");
+            if (UserId == null)
+                return Unauthorized();
+            
+            var todoItem = new TodoItem
+            {
+                Name = dto.Name,
+                IsComplete = dto.IsComplete,
+                UserId = UserId
+            };
+
             _context.TodoItems.Add(todoItem);
+
+
             await _context.SaveChangesAsync();
 
-            //return CreatedAtAction("GetTodoItem", new { id = todoItem.Id }, todoItem);
+            //return CreatedAtAction("GetTodoItem", new { id = todoItem.Id }, todoItem   
             return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItem);
         }
 
         // DELETE: api/TodoItems/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodoItem(long id)
         {
-            var todoItem = await _context.TodoItems.FindAsync(id);
+            var UserId = User.FindFirstValue("id");
+            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
+            
             if (todoItem == null)
             {
                 return NotFound();
