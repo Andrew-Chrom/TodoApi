@@ -1,15 +1,20 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Configuration;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using TodoApi.Interfaces;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+
 namespace TodoApi.Models
 {
+
+    
     public class ApplicationDbContext : IdentityDbContext<User>, IApplicationDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {}
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
@@ -40,5 +45,12 @@ namespace TodoApi.Models
             base.OnModelCreating(builder);
         }
 
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseNpgsql(_configuration.GetConnectionString("TodoApiDB"));
+        //    //base.OnConfiguring(optionsBuilder);
+
+        //}
     }
+
 }

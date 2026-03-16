@@ -17,14 +17,19 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<ApplicationDbContext>(opt =>
-    opt.UseInMemoryDatabase("TodoList"));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration["TodoApiDB"])); //builder.Configuration.GetConnectionString("TodoApiDB
 
 builder.Services.AddSwaggerGen();
 
-var jwtSettings = new JwtSettings();
-builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
-builder.Services.AddSingleton(jwtSettings);
+builder.Services
+.AddOptions<JwtSettings>()
+.Bind(builder.Configuration.GetSection("JwtSettings"))
+.ValidateDataAnnotations()
+.Validate(s => s.AccessTokenSecret.Length >= 32, "AccessTokenSecret must be at least 32 characters long")
+.Validate(s => s.RefreshTokenSecret.Length >= 32, "RefreshTokenSecret must be at least 32 characters long")
+.ValidateOnStart();
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options => {
     options.Password.RequireDigit = true;
@@ -55,7 +60,6 @@ builder.Services.AddAuthentication(x =>
         };
     });
 
-
 builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();
 builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
@@ -76,7 +80,6 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo API V1");
     });
-
 }
 
 app.UseHttpsRedirection();

@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using TodoApi.Interfaces;
@@ -10,7 +11,7 @@ namespace TodoApi.Services
     {
         private readonly JwtSettings _jwtSettings;
 
-        public RefreshTokenValidator(JwtSettings jwtSettings) => _jwtSettings = jwtSettings;
+        public RefreshTokenValidator(IOptions<JwtSettings> jwtOptions) => _jwtSettings = jwtOptions.Value;
 
         public bool Validate(string refreshToken)
         {
