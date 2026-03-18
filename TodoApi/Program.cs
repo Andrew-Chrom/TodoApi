@@ -8,6 +8,8 @@ using TodoApi.Interfaces;
 using TodoApi.Models;
 using TodoApi.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Wolverine;
+using TodoApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration["TodoApiDB"])); //builder.Configuration.GetConnectionString("TodoApiDB
 
 builder.Services.AddSwaggerGen();
+
+builder.Host.UseWolverine();
 
 builder.Services
 .AddOptions<JwtSettings>()
@@ -84,8 +88,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

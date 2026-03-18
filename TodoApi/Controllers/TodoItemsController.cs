@@ -7,8 +7,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TodoApi.Command.CreateTodo;
+using TodoApi.Command.DeleteTodo;
+using TodoApi.Command.ToggleTodo;
+using TodoApi.Command.UpdateTodo;
 using TodoApi.Models;
 using TodoApi.Models.DTO;
+using TodoApi.Query.GetTodoById;
+using TodoApi.Query.GetTodos;
+using Wolverine;
 
 namespace TodoApi.Controllers
 {
@@ -16,11 +23,10 @@ namespace TodoApi.Controllers
     [ApiController]
     public class TodoItemsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public TodoItemsController(ApplicationDbContext context)
+        private readonly IMessageBus _bus;
+        public TodoItemsController(IMessageBus bus)
         {
-            _context = context;
+            _bus = bus;
         }
 
         // GET: api/TodoItems
@@ -28,15 +34,10 @@ namespace TodoApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems([FromQuery(Name = "IsCompleted")] bool? IsComplete)
         {
-            var UserId = User.FindFirstValue("id");
+            var userId = User.FindFirstValue("id");
 
-            if (UserId == null)
-                return Unauthorized();
-
-            if (IsComplete == null)
-                return await _context.TodoItems.Where(x => x.UserId == UserId).ToListAsync();
-            else
-                return await _context.TodoItems.Where(x => x.IsComplete == IsComplete && x.UserId == UserId).ToListAsync();
+            return await _bus.InvokeAsync<List<TodoItem>>(
+                new GetTodosQuery(userId, IsComplete));
         }
 
         // GET: api/TodoItems/5
@@ -45,17 +46,10 @@ namespace TodoApi.Controllers
         public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
         {
             var UserId = User.FindFirstValue("id");
-            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
-
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
-
-            return todoItem;
+            
+            return await _bus.InvokeAsync<TodoItem>(
+                new GetTodoById(id, UserId));
         }
-
-        
 
         // POST api/toggle/5
         [Authorize]
@@ -63,32 +57,9 @@ namespace TodoApi.Controllers
         public async Task<ActionResult<TodoItem>> ToggleItem(long id)
         {
             var UserId = User.FindFirstValue("id");
-            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
-
-            if (todoItem == null)
-                return NotFound();
-
-            todoItem.IsComplete = !todoItem.IsComplete;
-
-            _context.Entry(todoItem).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TodoItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return todoItem;
+            
+            return await _bus.InvokeAsync<TodoItem>(
+                new ToggleTodoCommand(id, UserId));
         }
 
         // PUT: api/TodoItems/5
@@ -98,31 +69,7 @@ namespace TodoApi.Controllers
         public async Task<IActionResult> PutTodoItem(long id, TodoItemCreateDTO dto)
         {
             var UserId = User.FindFirstValue("id");
-            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
-
-            if (todoItem == null)
-                return BadRequest();
-
-            todoItem.Name = dto.Name;
-            todoItem.IsComplete = dto.IsComplete;
-
-            _context.Entry(todoItem).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TodoItemExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _bus.InvokeAsync(new UpdateTodoCommand(id, UserId, dto.Name, dto.IsComplete));
 
             return NoContent();
         }
@@ -134,23 +81,9 @@ namespace TodoApi.Controllers
         public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItemCreateDTO dto)
         {
             var UserId = User.FindFirstValue("id");
-            if (UserId == null)
-                return Unauthorized();
-            
-            var todoItem = new TodoItem
-            {
-                Name = dto.Name,
-                IsComplete = dto.IsComplete,
-                UserId = UserId
-            };
+            await _bus.InvokeAsync(new CreateTodoCommand(dto.Name, dto.IsComplete, UserId));
 
-            _context.TodoItems.Add(todoItem);
-
-
-            await _context.SaveChangesAsync();
-
-            //return CreatedAtAction("GetTodoItem", new { id = todoItem.Id }, todoItem   
-            return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItem);
+            return NoContent();
         }
 
         // DELETE: api/TodoItems/5
@@ -159,22 +92,9 @@ namespace TodoApi.Controllers
         public async Task<IActionResult> DeleteTodoItem(long id)
         {
             var UserId = User.FindFirstValue("id");
-            var todoItem = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == UserId);
-            
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
-
-            _context.TodoItems.Remove(todoItem);
-            await _context.SaveChangesAsync();
+            await _bus.InvokeAsync(new DeleteTodo(id, UserId));
 
             return NoContent();
-        }
-
-        private bool TodoItemExists(long id)
-        {
-            return _context.TodoItems.Any(e => e.Id == id);
         }
     }
 }
