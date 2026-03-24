@@ -1,11 +1,12 @@
 ﻿using TodoApi.Errors;
 using TodoApi.Models;
 
-namespace TodoApi.Command.CreateTodo
+namespace TodoApi.Command
 {
+    public record CreateTodoCommand(string Name, bool IsComplete, string UserId);
     public class CreateTodoHandler
     {
-        public async Task<long> Handle(CreateTodoCommand cmd, ApplicationDbContext db)
+        public async Task<long> Handle(CreateTodoCommand cmd, CommandDbContext db)
         {
             var todo = new TodoItem
             {
@@ -13,9 +14,6 @@ namespace TodoApi.Command.CreateTodo
                 IsComplete = cmd.IsComplete,
                 UserId = cmd.UserId
             };
-
-            if (todo == null)
-                throw new NotFoundException("Todo not found");
 
             db.TodoItems.Add(todo);
             await db.SaveChangesAsync();

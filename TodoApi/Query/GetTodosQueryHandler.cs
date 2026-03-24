@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoApi.Models;
 
-namespace TodoApi.Query.GetTodos
+namespace TodoApi.Query
 {
+    public record GetTodosQuery(string UserId, bool? IsComplete);
+
     public class GetTodosQueryHandler
     {
         public async Task<List<TodoItem>> Handle(

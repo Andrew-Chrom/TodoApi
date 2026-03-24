@@ -1,20 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using TodoApi.Command.CreateTodo;
-using TodoApi.Command.DeleteTodo;
-using TodoApi.Command.ToggleTodo;
-using TodoApi.Command.UpdateTodo;
+using TodoApi.Command;
 using TodoApi.Models;
 using TodoApi.Models.DTO;
-using TodoApi.Query.GetTodoById;
-using TodoApi.Query.GetTodos;
+using TodoApi.Query;
 using Wolverine;
 
 namespace TodoApi.Controllers
@@ -45,10 +35,10 @@ namespace TodoApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
         {
-            var UserId = User.FindFirstValue("id");
+            var userId = User.FindFirstValue("id");
             
             return await _bus.InvokeAsync<TodoItem>(
-                new GetTodoById(id, UserId));
+                new GetTodoById(id, userId));
         }
 
         // POST api/toggle/5
@@ -56,10 +46,10 @@ namespace TodoApi.Controllers
         [HttpPost("toggle/{id}")]
         public async Task<ActionResult<TodoItem>> ToggleItem(long id)
         {
-            var UserId = User.FindFirstValue("id");
+            var userId = User.FindFirstValue("id");
             
             return await _bus.InvokeAsync<TodoItem>(
-                new ToggleTodoCommand(id, UserId));
+                new ToggleTodoCommand(id, userId));
         }
 
         // PUT: api/TodoItems/5
@@ -68,8 +58,8 @@ namespace TodoApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTodoItem(long id, TodoItemCreateDTO dto)
         {
-            var UserId = User.FindFirstValue("id");
-            await _bus.InvokeAsync(new UpdateTodoCommand(id, UserId, dto.Name, dto.IsComplete));
+            var userId = User.FindFirstValue("id");
+            await _bus.InvokeAsync(new UpdateTodoCommand(id, userId, dto.Name, dto.IsComplete));
 
             return NoContent();
         }
@@ -80,8 +70,8 @@ namespace TodoApi.Controllers
         [HttpPost]
         public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItemCreateDTO dto)
         {
-            var UserId = User.FindFirstValue("id");
-            await _bus.InvokeAsync(new CreateTodoCommand(dto.Name, dto.IsComplete, UserId));
+            var userId = User.FindFirstValue("id");
+            await _bus.InvokeAsync(new CreateTodoCommand(dto.Name, dto.IsComplete, userId));
 
             return NoContent();
         }
@@ -91,8 +81,8 @@ namespace TodoApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodoItem(long id)
         {
-            var UserId = User.FindFirstValue("id");
-            await _bus.InvokeAsync(new DeleteTodo(id, UserId));
+            var userId = User.FindFirstValue("id");
+            await _bus.InvokeAsync(new DeleteTodo(id, userId));
 
             return NoContent();
         }

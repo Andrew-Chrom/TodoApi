@@ -1,14 +1,14 @@
 ﻿using Humanizer;
 using Microsoft.EntityFrameworkCore;
-using TodoApi.Command.UpdateTodo;
 using TodoApi.Errors;
 using TodoApi.Models;
 
-namespace TodoApi.Command.UpdateTodo
+namespace TodoApi.Command
 {
+    public record UpdateTodoCommand(long Id, string UserId, string Name, bool IsComplete);
     public class UpdateTodoHandler
     {
-        public async Task Handle(UpdateTodoCommand cmd, ApplicationDbContext db)
+        public async Task Handle(UpdateTodoCommand cmd, CommandDbContext db)
         {
             var todoItem = await db.TodoItems.FirstOrDefaultAsync(x => x.Id == cmd.Id && x.UserId == cmd.UserId);
 

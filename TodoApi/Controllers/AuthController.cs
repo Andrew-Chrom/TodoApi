@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TodoApi.Command.Refresh;
-using TodoApi.Command.Register;
-using TodoApi.Interfaces;
+using TodoApi.Command;
 using TodoApi.Models;
-using TodoApi.Query.Login;
-using TodoApi.Services;
+using TodoApi.Query;
 using Wolverine;
 
 namespace TodoApi.Controllers;
@@ -18,23 +14,9 @@ namespace TodoApi.Controllers;
 
 public class AuthController : Controller
 {
-    private readonly UserManager<User> _userManager;
-    private readonly IAuthenticateService _authService;
-    private readonly SignInManager<User> _signInManager;
-    private readonly IApplicationDbContext _context; 
-    private readonly IRefreshTokenValidator _refreshTokenValidator;
     private readonly IMessageBus _bus;
-    public AuthController(
-        UserManager<User> userManager,
-        IAuthenticateService authService,
-        IApplicationDbContext context,
-        IRefreshTokenValidator refreshTokenValidator,
-        IMessageBus bus)
+    public AuthController(IMessageBus bus)
     {
-        _userManager = userManager;
-        _authService = authService;
-        _context = context;
-        _refreshTokenValidator = refreshTokenValidator;
         _bus = bus;
     }
 

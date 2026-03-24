@@ -5,8 +5,9 @@ using TodoApi.Models;
 using TodoApi.Services;
 using TodoApi.Errors;
 
-namespace TodoApi.Command.Refresh
+namespace TodoApi.Command
 {
+    public record RefreshCommand(string RefreshToken, CancellationToken cancellationToken);
     public class RefreshHandler
     {
         private readonly UserManager<User> _userManager;

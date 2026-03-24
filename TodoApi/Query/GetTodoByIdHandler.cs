@@ -2,8 +2,10 @@
 using TodoApi.Errors;
 using TodoApi.Models;
 
-namespace TodoApi.Query.GetTodoById
+namespace TodoApi.Query
 {
+    public record GetTodoById(long Id, string UserId);
+
     public class GetTodoByIdHandler
     {
 

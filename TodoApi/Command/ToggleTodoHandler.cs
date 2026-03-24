@@ -2,13 +2,14 @@
 using TodoApi.Errors;
 using TodoApi.Models;
 
-namespace TodoApi.Command.ToggleTodo
+namespace TodoApi.Command
 {
+    public record ToggleTodoCommand(long Id, string UserId);
     public class ToggleTodoHandler
     {
         public async Task<TodoItem> Handle(
         ToggleTodoCommand command,
-        ApplicationDbContext db)
+        CommandDbContext db)
         {
             var todo = await db.TodoItems.FirstOrDefaultAsync(x => x.Id == command.Id && x.UserId == command.UserId);
 

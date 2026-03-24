@@ -4,8 +4,10 @@ using TodoApi.Errors;
 using TodoApi.Interfaces;
 using TodoApi.Models;
 
-namespace TodoApi.Query.Login
+namespace TodoApi.Query
 {
+    public record LoginQuery(string Email, string Password);
+
     public class LoginHandler
     {
 

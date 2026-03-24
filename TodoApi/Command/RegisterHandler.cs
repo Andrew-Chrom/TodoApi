@@ -2,8 +2,9 @@
 using System.Reflection.Metadata;
 using TodoApi.Models;
 
-namespace TodoApi.Command.Register
+namespace TodoApi.Command
 {
+    public record RegisterCommand(string Email, string Password);
     public class RegisterHandler
     {
         private readonly UserManager<User> _userManager;

@@ -21,6 +21,10 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration["TodoApiDB"])); //builder.Configuration.GetConnectionString("TodoApiDB
+builder.Services.AddDbContext<CommandDbContext>(options =>
+    options.UseNpgsql(builder.Configuration["TodoApiDB"]));
+builder.Services.AddDbContext<QueryDbContext>(options =>
+    options.UseNpgsql(builder.Configuration["TodoApiDB"]));
 
 builder.Services.AddSwaggerGen();
 
