@@ -10,6 +10,7 @@ using TodoApi.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Wolverine;
 using TodoApi.Middleware;
+using TodoApi.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,7 +76,9 @@ builder.Services.AddScoped<IRefreshTokenValidator, RefreshTokenValidator>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
     provider.GetRequiredService<ApplicationDbContext>());
-
+builder.Services.AddScoped<IWritableRepository, WritableRepository>();
+builder.Services.AddScoped<IReadonlyRepository, ReadonlyRepository>();
+    
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

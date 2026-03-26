@@ -1,24 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoApi.Errors;
 using TodoApi.Models;
+using TodoApi.Repositories;
 
 namespace TodoApi.Command
 {
     public record DeleteTodo(long Id, string UserId);
     public class DeleteTodoHandler
     {
-        public async Task Handle(DeleteTodo cmd,
-            CommandDbContext db)
+
+        public readonly IWritableRepository _repository;
+        public DeleteTodoHandler(IWritableRepository repository)
         {
-            var todoItem = await db.TodoItems.FirstOrDefaultAsync(x => x.Id == cmd.Id && x.UserId == cmd.UserId);
-
-            if (todoItem == null)
-                // Consider using not notFound but another exception, because not found is used for get queries
-                throw new NotFoundException("Todo not found");
-
-            db.TodoItems.Remove(todoItem);
-            await db.SaveChangesAsync();
-
+            _repository = repository;
+        }
+        public async Task Handle(DeleteTodo cmd)
+        {
+            await _repository.DeleteTodo(cmd.Id, cmd.UserId);
         }
 
     }

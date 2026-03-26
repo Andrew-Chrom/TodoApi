@@ -2,25 +2,29 @@
 using Microsoft.EntityFrameworkCore;
 using TodoApi.Errors;
 using TodoApi.Models;
+using TodoApi.Models.DTO;
+using TodoApi.Repositories;
 
 namespace TodoApi.Command
 {
     public record UpdateTodoCommand(long Id, string UserId, string Name, bool IsComplete);
     public class UpdateTodoHandler
     {
-        public async Task Handle(UpdateTodoCommand cmd, CommandDbContext db)
+        public readonly IWritableRepository _repository;
+        public UpdateTodoHandler(IWritableRepository repository)
         {
-            var todoItem = await db.TodoItems.FirstOrDefaultAsync(x => x.Id == cmd.Id && x.UserId == cmd.UserId);
+            _repository = repository;
+        }
+        public async Task Handle(UpdateTodoCommand cmd)
+        {
 
-            if (todoItem == null)
-                throw new NotFoundException("Todo not found");
+            var dto = new TodoItemCreateDTO
+            {
+                Name = cmd.Name,
+                IsComplete = cmd.IsComplete
+            };
 
-            todoItem.Name = cmd.Name;
-            todoItem.IsComplete = cmd.IsComplete;
-
-            db.Entry(todoItem).State = EntityState.Modified;
-
-            await db.SaveChangesAsync();
+            await _repository.UpdateTodo(dto, cmd.Id, cmd.UserId);
         }
     }
 }

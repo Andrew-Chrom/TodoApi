@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoApi.Errors;
 using TodoApi.Models;
+using TodoApi.Repositories;
 
 namespace TodoApi.Query
 {
@@ -8,15 +9,14 @@ namespace TodoApi.Query
 
     public class GetTodoByIdHandler
     {
-
-        public async Task<TodoItem> Handle(GetTodoById query, ApplicationDbContext db)
+        public readonly IReadonlyRepository _repository;
+        public GetTodoByIdHandler(IReadonlyRepository repository)
+        {
+            _repository = repository;
+        }
+        public async Task<TodoItem> Handle(GetTodoById query)
         {   
-            var todoItem = await db.TodoItems.FirstOrDefaultAsync(x => x.Id == query.Id && x.UserId == query.UserId);
-
-            if (todoItem == null)
-                throw new NotFoundException("Todo not found");
-
-            return todoItem;
+            return await _repository.GetTodoById(query.Id, query.UserId);
         }
     }
 }
