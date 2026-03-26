@@ -8,6 +8,9 @@ using TodoApi.Interfaces;
 using TodoApi.Models;
 using TodoApi.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Wolverine;
+using TodoApi.Middleware;
+using TodoApi.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,14 +20,25 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<ApplicationDbContext>(opt =>
-    opt.UseInMemoryDatabase("TodoList"));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration["TodoApiDB"])); //builder.Configuration.GetConnectionString("TodoApiDB
+builder.Services.AddDbContext<CommandDbContext>(options =>
+    options.UseNpgsql(builder.Configuration["TodoApiDB"]));
+builder.Services.AddDbContext<QueryDbContext>(options =>
+    options.UseNpgsql(builder.Configuration["TodoApiDB"]));
 
 builder.Services.AddSwaggerGen();
 
-var jwtSettings = new JwtSettings();
-builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
-builder.Services.AddSingleton(jwtSettings);
+builder.Host.UseWolverine();
+
+builder.Services
+.AddOptions<JwtSettings>()
+.Bind(builder.Configuration.GetSection("JwtSettings"))
+.ValidateDataAnnotations()
+.Validate(s => s.AccessTokenSecret.Length >= 32, "AccessTokenSecret must be at least 32 characters long")
+.Validate(s => s.RefreshTokenSecret.Length >= 32, "RefreshTokenSecret must be at least 32 characters long")
+.ValidateOnStart();
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options => {
     options.Password.RequireDigit = true;
@@ -55,7 +69,6 @@ builder.Services.AddAuthentication(x =>
         };
     });
 
-
 builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();
 builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
@@ -63,7 +76,9 @@ builder.Services.AddScoped<IRefreshTokenValidator, RefreshTokenValidator>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
     provider.GetRequiredService<ApplicationDbContext>());
-
+builder.Services.AddScoped<IWritableRepository, WritableRepository>();
+builder.Services.AddScoped<IReadonlyRepository, ReadonlyRepository>();
+    
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -76,13 +91,16 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo API V1");
     });
-
 }
 
 app.UseHttpsRedirection();
 
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
