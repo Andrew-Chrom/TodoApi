@@ -8,12 +8,12 @@ namespace TodoApi.TodoApi.Test
 {
     public class TodoControllerTests
     {
-        private TodoContext GetDbContext()
+        private ApplicationDbContext GetDbContext()
         {
-            var options = new DbContextOptionsBuilder<TodoContext>()
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
-            return new TodoContext(options);
+            return new ApplicationDbContext(options);
         }
 
         [Fact]
@@ -133,8 +133,8 @@ namespace TodoApi.TodoApi.Test
             var controller = new TodoItemsController(context);
 
             var actionResult = await controller.DeleteTodoItem(id: id);
-
-            Assert.IsType<NotFoundResult>(actionResult.Result);
+            
+            Assert.IsType<NotFoundResult>(actionResult);
         }
 
     }
