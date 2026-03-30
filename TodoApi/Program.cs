@@ -8,6 +8,9 @@ using TodoApi.Interfaces;
 using TodoApi.Models;
 using TodoApi.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Wolverine;
+using TodoApi.Middleware;
+using TodoApi.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +22,14 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration["TodoApiDB"])); //builder.Configuration.GetConnectionString("TodoApiDB
+builder.Services.AddDbContext<CommandDbContext>(options =>
+    options.UseNpgsql(builder.Configuration["TodoApiDB"]));
+builder.Services.AddDbContext<QueryDbContext>(options =>
+    options.UseNpgsql(builder.Configuration["TodoApiDB"]));
 
 builder.Services.AddSwaggerGen();
+
+builder.Host.UseWolverine();
 
 builder.Services
 .AddOptions<JwtSettings>()
@@ -67,7 +76,9 @@ builder.Services.AddScoped<IRefreshTokenValidator, RefreshTokenValidator>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
     provider.GetRequiredService<ApplicationDbContext>());
-
+builder.Services.AddScoped<IWritableRepository, WritableRepository>();
+builder.Services.AddScoped<IReadonlyRepository, ReadonlyRepository>();
+    
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -84,8 +95,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
