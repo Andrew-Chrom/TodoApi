@@ -1,13 +1,14 @@
 ﻿using TodoApi.Errors;
 using TodoApi.Models;
-using TodoApi.Repositories;
-namespace TodoApi.Command
+using TodoApi.Repositories.TodoItems;
+
+namespace TodoApi.Command.TodoItems
 {
     public record CreateTodoCommand(string Name, bool IsComplete, string UserId);
     public class CreateTodoHandler
     {
-        public readonly IWritableRepository _repository;
-        public CreateTodoHandler(IWritableRepository repository)
+        public readonly IWritableTodoItemRepository _repository;
+        public CreateTodoHandler(IWritableTodoItemRepository repository)
         {
             _repository = repository;
         }

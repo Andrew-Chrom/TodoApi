@@ -5,7 +5,7 @@ using TodoApi.Models;
 using TodoApi.Services;
 using TodoApi.Errors;
 
-namespace TodoApi.Command
+namespace TodoApi.Command.Authorization
 {
     public record RefreshCommand(string RefreshToken, CancellationToken cancellationToken);
     public class RefreshHandler

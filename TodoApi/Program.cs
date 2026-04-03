@@ -10,7 +10,9 @@ using TodoApi.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Wolverine;
 using TodoApi.Middleware;
-using TodoApi.Repositories;
+using TodoApi.Repositories.TodoItems;
+using TodoApi.Repositories.TodoLists;
+using TodoApi.UOF;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +29,7 @@ builder.Services.AddDbContext<CommandDbContext>(options =>
 builder.Services.AddDbContext<QueryDbContext>(options =>
     options.UseNpgsql(builder.Configuration["TodoApiDB"]));
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); 
 
 builder.Host.UseWolverine();
 
@@ -76,9 +78,11 @@ builder.Services.AddScoped<IRefreshTokenValidator, RefreshTokenValidator>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
     provider.GetRequiredService<ApplicationDbContext>());
-builder.Services.AddScoped<IWritableRepository, WritableRepository>();
-builder.Services.AddScoped<IReadonlyRepository, ReadonlyRepository>();
-    
+builder.Services.AddScoped<IWritableTodoItemRepository, WritableTodoItemRepository>();
+builder.Services.AddScoped<IReadonlyTodoItemRepository, ReadonlyTodoItemRepository>();
+builder.Services.AddScoped<IWritableTodoListRepository, WritableTodoListRepository>();
+builder.Services.AddScoped<IReadonlyTodoListRepository, ReadonlyTodoListRepository>();
+builder.Services.AddScoped<UnitOfWork>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

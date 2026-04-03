@@ -3,12 +3,12 @@ using TodoApi.Errors;
 using TodoApi.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace TodoApi.Repositories
+namespace TodoApi.Repositories.TodoItems
 {
-    public class ReadonlyRepository : IReadonlyRepository
+    public class ReadonlyTodoItemRepository : IReadonlyTodoItemRepository
     {
         public readonly QueryDbContext _ctx;
-        public ReadonlyRepository(QueryDbContext ctx)
+        public ReadonlyTodoItemRepository(QueryDbContext ctx)
         {
             _ctx = ctx;
         }
@@ -29,6 +29,21 @@ namespace TodoApi.Repositories
                 throw new NotFoundException("Todo not found");
 
             return todoItem;
+        }
+
+        public async Task<List<TodoList>> GetTodoList(string userId)
+        {
+            var todoList = _ctx.TodoLists.Where(x => x.UserId == userId);
+            return await todoList.ToListAsync();
+        }
+
+        public async Task<TodoList> GetTodoListById(long id, string userId)
+        {
+            var todoList = await _ctx.TodoLists.FirstOrDefaultAsync(x => x.UserId == userId && x.Id == id);
+            if(todoList == null)
+                throw new NotFoundException("Todo list not found");
+            
+            return todoList;
         }
 
     }

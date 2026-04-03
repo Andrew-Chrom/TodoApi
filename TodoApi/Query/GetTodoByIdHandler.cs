@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoApi.Errors;
 using TodoApi.Models;
-using TodoApi.Repositories;
+using TodoApi.Models.DTO;
+using TodoApi.Repositories.TodoItems;
 
 namespace TodoApi.Query
 {
@@ -9,8 +10,8 @@ namespace TodoApi.Query
 
     public class GetTodoByIdHandler
     {
-        public readonly IReadonlyRepository _repository;
-        public GetTodoByIdHandler(IReadonlyRepository repository)
+        public readonly IReadonlyTodoItemRepository _repository;
+        public GetTodoByIdHandler(IReadonlyTodoItemRepository repository)
         {
             _repository = repository;
         }

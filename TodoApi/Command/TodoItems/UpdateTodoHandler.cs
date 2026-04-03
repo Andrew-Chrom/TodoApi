@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using TodoApi.Errors;
 using TodoApi.Models;
 using TodoApi.Models.DTO;
-using TodoApi.Repositories;
+using TodoApi.Repositories.TodoItems;
 
-namespace TodoApi.Command
+namespace TodoApi.Command.TodoItems
 {
     public record UpdateTodoCommand(long Id, string UserId, string Name, bool IsComplete);
     public class UpdateTodoHandler
     {
-        public readonly IWritableRepository _repository;
-        public UpdateTodoHandler(IWritableRepository repository)
+        public readonly IWritableTodoItemRepository _repository;
+        public UpdateTodoHandler(IWritableTodoItemRepository repository)
         {
             _repository = repository;
         }

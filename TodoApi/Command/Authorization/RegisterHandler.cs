@@ -2,7 +2,7 @@
 using System.Reflection.Metadata;
 using TodoApi.Models;
 
-namespace TodoApi.Command
+namespace TodoApi.Command.Authorization
 {
     public record RegisterCommand(string Email, string Password);
     public class RegisterHandler

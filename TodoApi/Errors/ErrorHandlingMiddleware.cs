@@ -5,10 +5,11 @@ namespace TodoApi.Middleware
     public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate _next;
-
-        public ErrorHandlingMiddleware(RequestDelegate next)
+        private readonly ILogger<ErrorHandlingMiddleware> _logger;
+        public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext context)
@@ -30,6 +31,7 @@ namespace TodoApi.Middleware
             catch (Exception ex)
             {
                 context.Response.StatusCode = 500;
+                _logger.LogError(ex, "An unexpected error occurred");
                 await context.Response.WriteAsJsonAsync(new { error = "Internal server error" });
             }
         }

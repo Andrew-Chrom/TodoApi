@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TodoApi.Command;
+using TodoApi.Command.TodoItems;
 using TodoApi.Models;
 using TodoApi.Models.DTO;
 using TodoApi.Query;

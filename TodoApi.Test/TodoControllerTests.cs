@@ -62,12 +62,12 @@ namespace TodoApi.TodoApi.Test
             Assert.Empty(actionResult.Value);
         }
 
-        [Fact] 
+        [Fact]
         public async Task GetTodoItem_ExistingElement()
         {
             var context = GetDbContext();
             context.Add(new TodoItem { Id = 1, Name = "Wash dishes", IsComplete = true });
-            context.Add(new TodoItem { Id = 2, Name = "Walk dog", IsComplete = false});
+            context.Add(new TodoItem { Id = 2, Name = "Walk dog", IsComplete = false });
 
             await context.SaveChangesAsync();
 
@@ -133,7 +133,7 @@ namespace TodoApi.TodoApi.Test
             var controller = new TodoItemsController(context);
 
             var actionResult = await controller.DeleteTodoItem(id: id);
-            
+
             Assert.IsType<NotFoundResult>(actionResult);
         }
 

@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoApi.Errors;
 using TodoApi.Models;
-using TodoApi.Repositories;
+using TodoApi.Repositories.TodoItems;
 
-namespace TodoApi.Command
+namespace TodoApi.Command.TodoItems
 {
     public record DeleteTodo(long Id, string UserId);
-    public class DeleteTodoHandler
+    public class DeleteTodoListHandler
     {
 
-        public readonly IWritableRepository _repository;
-        public DeleteTodoHandler(IWritableRepository repository)
+        public readonly IWritableTodoItemRepository _repository;
+        public DeleteTodoListHandler(IWritableTodoItemRepository repository)
         {
             _repository = repository;
         }
