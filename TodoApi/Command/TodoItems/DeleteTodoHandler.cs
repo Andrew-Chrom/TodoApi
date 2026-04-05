@@ -6,11 +6,11 @@ using TodoApi.Repositories.TodoItems;
 namespace TodoApi.Command.TodoItems
 {
     public record DeleteTodo(long Id, string UserId);
-    public class DeleteTodoListHandler
+    public class DeleteTodoHandler
     {
 
         public readonly IWritableTodoItemRepository _repository;
-        public DeleteTodoListHandler(IWritableTodoItemRepository repository)
+        public DeleteTodoHandler(IWritableTodoItemRepository repository)
         {
             _repository = repository;
         }

@@ -23,12 +23,9 @@ namespace TodoApi.Repositories.TodoLists
             _logger = logger;
         }
 
-        public async Task<TodoList> GetTodoListById(long? id, string userId)
+        public async Task<TodoList>? GetTodoListById(long? id, string userId)
         {
             var todoList = await _ctx.TodoLists.Include(tl => tl.Items).FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-
-            if (todoList == null)
-                throw new NotFoundException("Todo not found");
 
             return todoList;
         }

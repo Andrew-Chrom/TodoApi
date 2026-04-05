@@ -71,7 +71,7 @@ namespace TodoApi.Controllers
 
         [Authorize]
         [HttpDelete]
-        [Route("{todoListId}/{todoItemId}")]
+        [Route("remove/{todoListId}/{todoItemId}")]
         public async Task<IActionResult> RemoveTodoListItem(long todoListId, long todoItemId)
         {
             var userId = User.FindFirstValue("id");
@@ -82,7 +82,7 @@ namespace TodoApi.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("{todoListId}/{todoItemId}")]
+        [Route("add/{todoListId}/{todoItemId}")]
         public async Task<IActionResult> AddTodoListItem(long todoListId, long todoItemId)
         {
             var userId = User.FindFirstValue("id");

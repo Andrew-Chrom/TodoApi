@@ -19,20 +19,6 @@ namespace TodoApi.Command.TodoItems
         public async Task<TodoItemResponseDTO> Handle(
         ToggleTodoCommand command)
         {
-            //var todo = await _ctx.TodoItems.FirstOrDefaultAsync(x => x.Id == command.Id && x.UserId == command.UserId);
-
-            //if (todo == null)
-            //    throw new NotFoundException("Todo not found");
-
-            //todo.IsComplete = !todo.IsComplete;
-
-            //if (todo.IsComplete)
-
-
-            //await _ctx.SaveChangesAsync();
-
-            //return todo;
-
             var todo = await _unitOfWork.TodoItemRepo.GetTodoById(command.Id, command.UserId);
             
             if (todo == null)

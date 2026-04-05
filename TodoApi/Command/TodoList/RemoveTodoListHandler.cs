@@ -9,17 +9,14 @@ namespace TodoApi.Command.TodoList
     public class RemoveTodoListHandler
     {
         public readonly IReadonlyTodoItemRepository _todoItemReadonlyRepository;
-        public readonly IWritableTodoItemRepository _todoItemWritableRepository;
         public readonly UnitOfWork _unitOfWork;
         public readonly ILogger<RemoveTodoListHandler> _logger;
         public RemoveTodoListHandler(
             IReadonlyTodoItemRepository todoItemReadonlyRepository,
-            IWritableTodoItemRepository todoItemWritableRepository,
             UnitOfWork unitOfWork,
             ILogger<RemoveTodoListHandler> logger)
         {
             _todoItemReadonlyRepository = todoItemReadonlyRepository;
-            _todoItemWritableRepository = todoItemWritableRepository;
             _unitOfWork = unitOfWork;
             _logger = logger;
         }

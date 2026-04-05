@@ -19,8 +19,6 @@ namespace TodoApi.Command.TodoList
 
         public async Task Handle(MoveTodoItemCommand cmd)
         {
-            // COUNTERS. Change counters!!!!
-
             var todoList = await _unitOfWork.TodoListRepo.GetTodoListById(cmd.TodoListId, cmd.UserId);
 
             if(todoList == null)
