@@ -60,24 +60,6 @@ namespace TodoApi.Repositories.TodoItems
 
             await _ctx.SaveChangesAsync();
             await transaction.CommitAsync();
-            //using var transaction = await _ctx.Database.BeginTransactionAsync();
-
-            //var todoItem = await _ctx.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-
-            //if (todoItem == null)
-            //    throw new NotFoundException("Todo not found");
-
-            //todoItem.Name = dto.Name;
-            //todoItem.IsComplete = dto.IsComplete;
-
-            //_logger.LogInformation("Updating TodoItem with Id {Id} for user {UserId}", id, userId);
-            //_logger.LogInformation("TodoList id: {dto.TodoListId}", dto.TodoListId);
-
-            //todoItem.TodoListId = dto.TodoListId;
-
-            //await _ctx.SaveChangesAsync();
-
-            //await transaction.CommitAsync();
         }
         public async Task DeleteTodo(long id, string userId)
         {
