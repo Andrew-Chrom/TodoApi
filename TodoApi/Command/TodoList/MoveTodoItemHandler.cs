@@ -22,33 +22,28 @@ namespace TodoApi.Command.TodoList
             var todoList = await _unitOfWork.TodoListRepo.GetTodoListById(cmd.TodoListId, cmd.UserId);
 
             if(todoList == null)
-                throw new NotFoundException("Todo list not found");
+                throw new NotFoundException("TodoList not found");
             
             var todoItem = todoList.Items.Find(item => item.Id == cmd.TodoItemId);
 
             if (todoItem == null)
-                throw new NotFoundException("Todo item not found");
+                throw new NotFoundException("TodoItem not found");
 
-            var list = await _unitOfWork.TodoListRepo.GetTodoListById(cmd.TodoListId, cmd.UserId);
-            var destinationList = await _unitOfWork.TodoListRepo.GetTodoListById(cmd.TodoListId, cmd.UserId);
+            var destinationList = await _unitOfWork.TodoListRepo.GetTodoListById(cmd.DestinationTodoListId, cmd.UserId);
+
+            if (destinationList == null)
+                throw new NotFoundException("Destination TodoList not found");
 
             if (todoItem.IsComplete)
             {
-                list.CompletedItemsCount -= 1;
+                todoList.CompletedItemsCount -= 1;
                 destinationList.CompletedItemsCount += 1;
             }
             else
             {
-                list.OpenItemsCount -= 1;
+                todoList.OpenItemsCount -= 1;
                 destinationList.OpenItemsCount += 1;
             }
-
-            await _unitOfWork.TodoItemRepo.UpdateTodo(new TodoItemCreateDTO
-            {
-                IsComplete = todoItem.IsComplete,
-                Name = todoItem.Name,
-                TodoListId = null
-            }, todoItem.Id, cmd.UserId);
 
             await _unitOfWork.TodoItemRepo.UpdateTodo(new TodoItemCreateDTO
             {
