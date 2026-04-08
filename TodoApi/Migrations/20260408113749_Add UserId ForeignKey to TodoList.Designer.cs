@@ -12,8 +12,8 @@ using TodoApi.Models;
 namespace TodoApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260331122624_Add TodoList entity in TodoItem")]
-    partial class AddTodoListentityinTodoItem
+    [Migration("20260408113749_Add UserId ForeignKey to TodoList")]
+    partial class AddUserIdForeignKeytoTodoList
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -232,9 +232,12 @@ namespace TodoApi.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TodoLists");
                 });
@@ -380,7 +383,23 @@ namespace TodoApi.Migrations
 
             modelBuilder.Entity("TodoApi.Models.TodoList", b =>
                 {
+                    b.HasOne("TodoApi.Models.User", "User")
+                        .WithMany("TodoLists")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TodoApi.Models.TodoList", b =>
+                {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("TodoApi.Models.User", b =>
+                {
+                    b.Navigation("TodoLists");
                 });
 #pragma warning restore 612, 618
         }

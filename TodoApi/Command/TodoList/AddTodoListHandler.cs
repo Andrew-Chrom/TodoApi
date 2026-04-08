@@ -29,6 +29,11 @@ namespace TodoApi.Command.TodoList
 
             var todoItem = await _todoItemReadonlyRepository.GetTodoById(command.TodoItemId, command.UserId);
 
+            if (todoItem.TodoListId == command.TodoListId)
+            {
+                throw new Exception($"TodoItem with id {command.TodoItemId} is already in the TodoList with id {command.TodoListId}");
+            }
+
             _logger.LogInformation("Before UpdateTodo: command.TodoListId={TodoListId}", command.TodoListId);
 
             await _unitOfWork.TodoItemRepo.UpdateTodo(new TodoItemCreateDTO

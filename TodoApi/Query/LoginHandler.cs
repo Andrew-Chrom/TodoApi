@@ -12,9 +12,9 @@ namespace TodoApi.Query
     {
 
         private readonly UserManager<User> _userManager;
-        private readonly IAuthenticateService _authService;
+        private readonly ITokenIssuer _authService;
 
-        public LoginHandler(UserManager<User> userManager, IAuthenticateService authService)
+        public LoginHandler(UserManager<User> userManager, ITokenIssuer authService)
         {
             _userManager = userManager;
             _authService = authService;
@@ -24,12 +24,12 @@ namespace TodoApi.Query
             var user = await _userManager.FindByEmailAsync(query.Email);
 
             if (user == null)
-                throw new NotFoundException("User not found");
+                throw new UnathorizedException("");
 
             if (await _userManager.CheckPasswordAsync(user, query.Password))
-                return await _authService.Authenticate(user, default);
+                return await _authService.IssueTokensAsync(user, default);
             else
-                throw new Exception("Unauthorized");
+                throw new UnathorizedException("");
         }
 
     }

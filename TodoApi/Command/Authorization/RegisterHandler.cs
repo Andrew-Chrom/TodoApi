@@ -15,6 +15,11 @@ namespace TodoApi.Command.Authorization
         }
         public async Task<IdentityResult> Handle(RegisterCommand cmd)
         {
+            if (await _userManager.FindByEmailAsync(cmd.Email) is not null)
+            {
+                throw new Exception("User with this email exists");
+            }
+
             var user = new User(cmd.Email)
             {
                 UserName = cmd.Email,

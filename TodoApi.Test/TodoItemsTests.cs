@@ -45,7 +45,7 @@ namespace TodoApi.TodoApi.Test
             await context.SaveChangesAsync();
 
             var logger = NullLogger<WritableTodoListRepository>.Instance;
-            var handler = new ToggleTodoHandler(context, new UnitOfWork(context, logger));
+            var handler = new ToggleTodoHandler(new UnitOfWork(context, logger));
 
             var userId = "test-user-id";
             await handler.Handle(new ToggleTodoCommand(1L, userId));

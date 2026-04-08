@@ -24,7 +24,7 @@ namespace TodoApi.Command.TodoList
             if(todoList == null)
                 throw new NotFoundException("TodoList not found");
             
-            var todoItem = todoList.Items.Find(item => item.Id == cmd.TodoItemId);
+            var todoItem = todoList.Items.FirstOrDefault(item => item.Id == cmd.TodoItemId);
 
             if (todoItem == null)
                 throw new NotFoundException("TodoItem not found");

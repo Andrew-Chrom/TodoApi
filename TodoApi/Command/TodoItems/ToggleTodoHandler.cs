@@ -10,10 +10,8 @@ namespace TodoApi.Command.TodoItems
     public class ToggleTodoHandler
     {
         public UnitOfWork _unitOfWork;
-        public CommandDbContext _ctx;
-        public ToggleTodoHandler(CommandDbContext ctx, UnitOfWork unitOfWork)
+        public ToggleTodoHandler(UnitOfWork unitOfWork)
         {
-            _ctx = ctx;
             _unitOfWork = unitOfWork;
         }
         public async Task<TodoItemResponseDTO> Handle(

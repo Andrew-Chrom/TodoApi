@@ -19,10 +19,7 @@ namespace TodoApi.Command.TodoList
         }
         public async Task<long> Handle(CreateTodoListCommand command)
         {
-            var todo = new TodoListCreateDto
-            {
-                Title = command.Title
-            };
+            var todo = new TodoListCreateDto(command.Title);
 
             var id = await _repository.CreateTodoList(todo, command.UserId);
 

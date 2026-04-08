@@ -10,17 +10,19 @@ using Wolverine;
 using static TodoApi.Command.TodoList.MoveTodoItemHandler;
 namespace TodoApi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TodoListController : ControllerBase
     {
         public IMessageBus _bus;
-
-        public TodoListController(IMessageBus bus)
+        public ILogger<TodoListController> _logger;
+        public TodoListController(IMessageBus bus, ILogger<TodoListController> logger)
         {
             _bus = bus;
+            _logger = logger;
         }
-        [Authorize]
+
         [HttpGet]
         public async Task<List<TodoListResponseDto>> GetTodoList()
         {
@@ -28,16 +30,13 @@ namespace TodoApi.Controllers
             return await _bus.InvokeAsync<List<TodoListResponseDto>>(new GetTodoListQuery(userId));
         }
 
-        [Authorize]
-        [HttpGet]
-        [Route("{todoListId}")]
-        public async Task<TodoListItemResponseDto> GetTodoListById(long todoListId)
+        [HttpGet("{id:long}")]
+        public async Task<TodoListItemResponseDto> GetTodoListById(long id)
         {
             var userId = User.FindFirstValue("id");
-            return await _bus.InvokeAsync<TodoListItemResponseDto>(new GetTodoListByIdQuery(todoListId, userId));
+            return await _bus.InvokeAsync<TodoListItemResponseDto>(new GetTodoListByIdQuery(id, userId));
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateTodoList(TodoListCreateDto dto)
         {
@@ -47,31 +46,24 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
-        [Authorize]
-        [HttpPut]
-        [Route("{todoListId}")]
-        public async Task<IActionResult> UpdateTodoList(long todoListId, TodoListCreateDto dto)
+        [HttpPut("{id:long}")]
+        public async Task<IActionResult> UpdateTodoList(long id, TodoListCreateDto dto)
         {
             var userId = User.FindFirstValue("id");
-            await _bus.InvokeAsync(new UpdateTodoCommand(todoListId, dto.Title, userId));
+            await _bus.InvokeAsync(new UpdateTodoCommand(id, dto.Title, userId));
 
             return NoContent();
         }
 
-        [Authorize]
-        [HttpDelete]
-        [Route("{todoListId}")]
-        public async Task<IActionResult> DeleteTodoList(long todoListId)
+        [HttpDelete("{id:long}")]
+        public async Task<IActionResult> DeleteTodoList(long id)
         {
             var userId = User.FindFirstValue("id");
-            await _bus.InvokeAsync(new DeleteTodoListCommand(todoListId, userId));
+            await _bus.InvokeAsync(new DeleteTodoListCommand(id, userId));
 
             return NoContent();
         }
-
-        [Authorize]
-        [HttpDelete]
-        [Route("remove/{todoListId}/{todoItemId}")]
+        [HttpDelete("{todoListId}/items/{todoItemId}")]
         public async Task<IActionResult> RemoveTodoListItem(long todoListId, long todoItemId)
         {
             var userId = User.FindFirstValue("id");
@@ -80,9 +72,7 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
-        [Authorize]
-        [HttpPost]
-        [Route("add/{todoListId}/{todoItemId}")]
+        [HttpPost("{todoListId}/items/{todoItemId}")]
         public async Task<IActionResult> AddTodoListItem(long todoListId, long todoItemId)
         {
             var userId = User.FindFirstValue("id");
@@ -91,16 +81,18 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
-        // Not sure how to name path because move breaks REST because it contains a verb
-        [Authorize]
-        [HttpPost]
-        [Route("{todoListId}/move/{todoItemId}/to/{destinationTodoListId}")]
-        public async Task<IActionResult> MoveTodoListItem(long todoListId, long todoItemId, long destinationTodoListId)
+        [HttpPatch("{todoListId}/items/{destinationTodoListId}")]
+        public async Task<IActionResult> MoveTodoListItem([FromRoute(Name = "todoListId")] long todoListId,
+            [FromRoute(Name = "destinationTodoListId")] long destinationTodoListId,
+            [FromBody] MoveTodoItemDto dto)
         {
             var userId = User.FindFirstValue("id");
 
-            await _bus.InvokeAsync(new MoveTodoItemCommand(userId, todoListId, todoItemId, destinationTodoListId));
-               
+            _logger.LogInformation("Moving todo item {TodoItemId} from list {TodoListId} to list {DestinationTodoListId} for user {UserId}",
+                dto.TodoItemId, todoListId, destinationTodoListId, userId);
+
+            await _bus.InvokeAsync(new MoveTodoItemCommand(userId, todoListId, dto.TodoItemId, destinationTodoListId));
+
             return NoContent();
         }
 

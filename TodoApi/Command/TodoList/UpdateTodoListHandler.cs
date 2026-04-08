@@ -18,10 +18,7 @@ namespace TodoApi.Command.TodoList
         public async Task Handle(UpdateTodoCommand cmd)
         {
 
-            var dto = new TodoListCreateDto
-            {
-                Title = cmd.Title
-            };
+            var dto = new TodoListCreateDto(cmd.Title);
 
             await _repository.UpdateTodoList(dto, cmd.id, cmd.UserId);
         }
