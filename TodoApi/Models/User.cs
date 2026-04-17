@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace TodoApi.Models
 {
@@ -34,5 +33,9 @@ namespace TodoApi.Models
         /// Gets or sets the physical address for this user.
         /// </summary>
         public string? Address { get; set; }
+        /// <summary>
+        /// Gets or sets all the todo lists that belong to this user.
+        /// </summary>
+        public virtual ICollection<TodoList> TodoLists { get; set; } = new List<TodoList>();
     }
 }
