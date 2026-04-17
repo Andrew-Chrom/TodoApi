@@ -134,7 +134,7 @@ namespace TodoApi.TodoApi.Test
 
             await context.SaveChangesAsync();
 
-            var handler = new DeleteTodoHandler(new WritableTodoItemRepository(context));
+            var handler = new DeleteTodoHandler(new UnitOfWork(context, NullLogger<WritableTodoListRepository>.Instance));
             var result = handler.Handle(new DeleteTodo(1L, "test-user-id"));
             
             var TodoItems = await context.TodoItems.ToListAsync();
@@ -156,7 +156,7 @@ namespace TodoApi.TodoApi.Test
 
             await context.SaveChangesAsync();
 
-            var handler = new DeleteTodoHandler(new WritableTodoItemRepository(context));
+            var handler = new DeleteTodoHandler(new UnitOfWork(context, NullLogger<WritableTodoListRepository>.Instance));
 
             await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(new DeleteTodo(id, userId)));
         }

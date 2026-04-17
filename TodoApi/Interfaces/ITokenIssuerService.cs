@@ -1,15 +1,11 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using TodoApi.Models;
+﻿using TodoApi.Models;
 
 namespace TodoApi.Interfaces
 {
     /// <summary>
     /// Interface for authentication.
     /// </summary>
-    public interface ITokenIssuer 
+    public interface ITokenIssuerService 
     {
         /// <summary>
         /// Authenticates user.

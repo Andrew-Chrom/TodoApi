@@ -4,12 +4,12 @@ using TodoApi.Models;
 
 namespace TodoApi.Services
 {
-    public class TokenIssuer : ITokenIssuer
+    public class TokenIssuerService : ITokenIssuerService
     {
         private readonly IAccessTokenService _accessTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
         private readonly IApplicationDbContext _context;
-        public TokenIssuer(IAccessTokenService accessTokenService, IRefreshTokenService refreshTokenService, IApplicationDbContext context)
+        public TokenIssuerService(IAccessTokenService accessTokenService, IRefreshTokenService refreshTokenService, IApplicationDbContext context)
         {
             _accessTokenService = accessTokenService;
             _refreshTokenService = refreshTokenService;

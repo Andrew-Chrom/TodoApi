@@ -1,7 +1,5 @@
-﻿using TodoApi.Models;
+﻿using TodoApi.Errors;
 using TodoApi.Models.DTO;
-using TodoApi.Repositories;
-using TodoApi.Repositories.TodoItems;
 using TodoApi.Repositories.TodoLists;
 
 namespace TodoApi.Query
@@ -17,7 +15,11 @@ namespace TodoApi.Query
 
         public async Task<TodoListItemResponseDto> Handle(GetTodoListByIdQuery query)
         {
-            return await _repository.GetTodoListById(query.Id, query.UserId);
+            var todoList = await _repository.GetTodoListById(query.Id, query.UserId);
+            if (todoList == null)
+                throw new NotFoundException("Todo not found");
+
+            return todoList;
         }
 
     }

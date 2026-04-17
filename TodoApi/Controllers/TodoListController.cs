@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TodoApi.Command.TodoList;
-using TodoApi.Models;
 using TodoApi.Models.DTO;
 using TodoApi.Query;
 using Wolverine;
 using static TodoApi.Command.TodoList.MoveTodoItemHandler;
+
 namespace TodoApi.Controllers
 {
     [Authorize]

@@ -26,15 +26,13 @@ namespace TodoApi.Repositories.TodoLists
 
             return await todoLists.ToListAsync();
         }
-        public async Task<TodoListItemResponseDto> GetTodoListById(long id, string userId)
+        public async Task<TodoListItemResponseDto?>? GetTodoListById(long id, string userId)
         {
             var todoList = await _ctx.TodoLists
                 .Include(tl => tl.Items)
                 .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-
-            if (todoList == null)
-                throw new NotFoundException("Todo not found");
-
+            if (todoList is null)
+                return null;
             return new TodoListItemResponseDto
             {
                 Id = todoList.Id,

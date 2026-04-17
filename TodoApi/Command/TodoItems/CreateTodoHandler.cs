@@ -1,16 +1,15 @@
-﻿using TodoApi.Errors;
-using TodoApi.Models;
-using TodoApi.Repositories.TodoItems;
+﻿using TodoApi.Models;
+using TodoApi.UOF;
 
 namespace TodoApi.Command.TodoItems
 {
     public record CreateTodoCommand(string Name, bool IsComplete, string UserId);
     public class CreateTodoHandler
     {
-        public readonly IWritableTodoItemRepository _repository;
-        public CreateTodoHandler(IWritableTodoItemRepository repository)
+        public readonly UnitOfWork _unitOfWork;
+        public CreateTodoHandler(UnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
         public async Task<long> Handle(CreateTodoCommand cmd)
         {
@@ -21,8 +20,8 @@ namespace TodoApi.Command.TodoItems
                 UserId = cmd.UserId
             };
 
-            var id = await _repository.CreateTodo(todo);
-
+            var id = await _unitOfWork.TodoItemRepo.CreateTodo(todo);
+            await _unitOfWork.CompleteAsync();
             return id;
         }
     }

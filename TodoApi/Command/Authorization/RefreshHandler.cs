@@ -1,29 +1,26 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using TodoApi.Interfaces;
+﻿using TodoApi.Interfaces;
 using TodoApi.Models;
-using TodoApi.Services;
 using TodoApi.Errors;
+using TodoApi.Repositories.Auth;
 
 namespace TodoApi.Command.Authorization
 {
     public record RefreshCommand(string RefreshToken, CancellationToken cancellationToken);
     public class RefreshHandler
     {
-        private readonly UserManager<User> _userManager;
-        private readonly ITokenIssuer _authService;
-        private readonly SignInManager<User> _signInManager;
-        private readonly IApplicationDbContext _context;
+        private readonly ITokenIssuerService _authService;
+        private readonly IUserRepository _userRepository;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IRefreshTokenValidator _refreshTokenValidator;
         public RefreshHandler(
-        UserManager<User> userManager,
-        ITokenIssuer authService,
-        IApplicationDbContext context,
+        ITokenIssuerService authService,
+        IUserRepository userRepository,
+        IRefreshTokenRepository refreshTokenRepository,
         IRefreshTokenValidator refreshTokenValidator)
         {
-            _userManager = userManager;
             _authService = authService;
-            _context = context;
+            _userRepository = userRepository;
+            _refreshTokenRepository = refreshTokenRepository;
             _refreshTokenValidator = refreshTokenValidator;
         }
         public async Task<AuthenticateResponse> Handle(RefreshCommand cmd)
@@ -31,15 +28,12 @@ namespace TodoApi.Command.Authorization
             var isValid = _refreshTokenValidator.Validate(cmd.RefreshToken);
             if (!isValid) throw new UnathorizedException("");
 
-            var refreshToken = await _context.RefreshTokens
-                .FirstOrDefaultAsync(x => x.Token == cmd.RefreshToken);
-
+            var refreshToken = await _refreshTokenRepository.GetByIdAsync(cmd.RefreshToken); 
             if (refreshToken == null) throw new UnathorizedException("");
 
-            _context.RefreshTokens.Remove(refreshToken);
-            await _context.SaveChangesAsync(cmd.cancellationToken);
+            await _refreshTokenRepository.RemoveAsync(refreshToken);
 
-            var user = await _userManager.FindByIdAsync(refreshToken.UserId.ToString());
+            var user = await _userRepository.GetUserByIdAsync(refreshToken.UserId);
             if (user == null) throw new UnathorizedException("");
 
             var response = await _authService.IssueTokensAsync(user, default);

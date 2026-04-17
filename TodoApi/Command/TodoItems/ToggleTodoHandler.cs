@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.Design;
-using TodoApi.Errors;
-using TodoApi.Models;
+﻿using TodoApi.Errors;
 using TodoApi.Models.DTO;
 using TodoApi.UOF;
 namespace TodoApi.Command.TodoItems
@@ -18,10 +15,9 @@ namespace TodoApi.Command.TodoItems
         ToggleTodoCommand command)
         {
             var todo = await _unitOfWork.TodoItemRepo.GetTodoById(command.Id, command.UserId);
-            
+
             if (todo == null)
                 throw new NotFoundException("Todo not found");
-
             await _unitOfWork.TodoItemRepo.UpdateTodo(new TodoItemCreateDTO
             {
                 Name = todo.Name,

@@ -8,6 +8,8 @@ namespace TodoApi.Models
         public string? Name { get; set; }
         public bool IsComplete { get; set; }
         public string UserId { get; set; }
+        [ForeignKey(nameof(UserId))]
+        public User User { get; set; }
         public long? TodoListId { get; set; }
 
         [ForeignKey(nameof(TodoListId))]

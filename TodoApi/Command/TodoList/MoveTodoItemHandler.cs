@@ -1,9 +1,6 @@
 ﻿using TodoApi.Errors;
-using TodoApi.Models;
 using TodoApi.Models.DTO;
-using TodoApi.Repositories.TodoLists;
 using TodoApi.UOF;
-using Wolverine.Persistence;
 
 namespace TodoApi.Command.TodoList
 {
@@ -44,13 +41,16 @@ namespace TodoApi.Command.TodoList
                 todoList.OpenItemsCount -= 1;
                 destinationList.OpenItemsCount += 1;
             }
-
+            
             await _unitOfWork.TodoItemRepo.UpdateTodo(new TodoItemCreateDTO
             {
                 IsComplete = todoItem.IsComplete,
                 Name = todoItem.Name,
                 TodoListId = cmd.DestinationTodoListId
             }, todoItem.Id, cmd.UserId);
+
+            todoList.Updated = DateTime.UtcNow;
+            destinationList.Updated = DateTime.UtcNow;
 
             await _unitOfWork.CompleteAsync();
         }

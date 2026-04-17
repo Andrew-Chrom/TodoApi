@@ -1,10 +1,6 @@
 ﻿using TodoApi.Models.DTO;
 using TodoApi.Repositories.TodoItems;
-using TodoApi.Repositories.TodoLists;
-using Microsoft.Extensions.Logging;
 using TodoApi.UOF;
-
-
 
 namespace TodoApi.Command.TodoList
 {
@@ -31,7 +27,7 @@ namespace TodoApi.Command.TodoList
 
             if (todoItem.TodoListId == command.TodoListId)
             {
-                throw new Exception($"TodoItem with id {command.TodoItemId} is already in the TodoList with id {command.TodoListId}");
+                throw new Exception($"{todoItem.TodoListId},{command.TodoListId} TodoItem with id {command.TodoItemId} is already in the TodoList with id {command.TodoListId}");
             }
 
             _logger.LogInformation("Before UpdateTodo: command.TodoListId={TodoListId}", command.TodoListId);

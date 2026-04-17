@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
+﻿using TodoApi.Models;
+using TodoApi.Models.DTO;
 using TodoApi.Repositories.TodoItems;
 
 namespace TodoApi.Query
@@ -14,7 +14,7 @@ namespace TodoApi.Query
             _repository = repository;
         }
 
-        public async Task<List<TodoItem>> Handle(GetTodosQuery query)
+        public async Task<List<TodoItemResponseDTO>> Handle(GetTodosQuery query)
         {
             return await _repository.GetTodos(query.UserId, query.IsComplete);
         }

@@ -5,7 +5,7 @@ namespace TodoApi.Repositories.TodoItems
 {
     public interface IReadonlyTodoItemRepository
     {
-        Task<List<TodoItem>> GetTodos(string userId, bool? isComplete);
-        Task<TodoItem> GetTodoById(long id, string userId);
+        Task<List<TodoItemResponseDTO>> GetTodos(string userId, bool? isComplete);
+        Task<TodoItemResponseDTO> GetTodoById(long id, string userId);
     }
 }

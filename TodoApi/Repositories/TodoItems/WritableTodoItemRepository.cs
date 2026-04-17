@@ -26,9 +26,6 @@ namespace TodoApi.Repositories.TodoItems
         {
             var todoItem = await _ctx.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
-            if (todoItem == null)
-                throw new NotFoundException("Todo not found");
-
             return new TodoItemResponseDTO
             {
                 Id = todoItem.Id,
@@ -47,7 +44,6 @@ namespace TodoApi.Repositories.TodoItems
         }
         public async Task UpdateTodo(TodoItemCreateDTO dto, long id, string userId)
         {
-            using var transaction = await _ctx.Database.BeginTransactionAsync();
 
             var todoItem = await _ctx.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
@@ -57,9 +53,6 @@ namespace TodoApi.Repositories.TodoItems
             todoItem.Name = dto.Name;
             todoItem.IsComplete = dto.IsComplete;
             todoItem.TodoListId = dto.TodoListId;
-
-            await _ctx.SaveChangesAsync();
-            await transaction.CommitAsync();
         }
         public async Task DeleteTodo(long id, string userId)
         {
@@ -69,7 +62,6 @@ namespace TodoApi.Repositories.TodoItems
                 throw new NotFoundException("Todo not found");
 
             _ctx.TodoItems.Remove(todoItem);
-            await _ctx.SaveChangesAsync();
         }
     }
 }

@@ -1,21 +1,21 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.Reflection.Metadata;
 using TodoApi.Models;
+using TodoApi.Repositories.Auth;
 
 namespace TodoApi.Command.Authorization
 {
     public record RegisterCommand(string Email, string Password);
     public class RegisterHandler
     {
-        private readonly UserManager<User> _userManager;
+        private readonly IUserRepository _userRepository;
 
-        public RegisterHandler(UserManager<User> userManager)
+        public RegisterHandler(IUserRepository userRepository)
         {
-            _userManager = userManager;
+            _userRepository = userRepository;
         }
         public async Task<IdentityResult> Handle(RegisterCommand cmd)
         {
-            if (await _userManager.FindByEmailAsync(cmd.Email) is not null)
+            if (await _userRepository.GetUserByEmailAsync(cmd.Email) is not null)
             {
                 throw new Exception("User with this email exists");
             }
@@ -26,8 +26,8 @@ namespace TodoApi.Command.Authorization
                 Email = cmd.Email
             };
 
-            var result = await _userManager.CreateAsync(user, cmd.Password);
-            return result;
+            return await _userRepository.AddUserAsync(user, cmd.Password);
+            
         }
 
     }

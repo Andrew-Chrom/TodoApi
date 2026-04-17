@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using TodoApi.Command;
 using TodoApi.Command.TodoItems;
 using TodoApi.Models;
 using TodoApi.Models.DTO;
@@ -23,21 +22,21 @@ namespace TodoApi.Controllers
 
         // GET: api/TodoItems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems([FromQuery(Name = "IsCompleted")] bool? IsComplete)
+        public async Task<ActionResult<IEnumerable<TodoItemResponseDTO>>> GetTodoItems([FromQuery(Name = "IsCompleted")] bool? IsComplete)
         {
             var userId = User.FindFirstValue("id");
 
-            return await _bus.InvokeAsync<List<TodoItem>>(
+            return await _bus.InvokeAsync<List<TodoItemResponseDTO>>(
                 new GetTodosQuery(userId, IsComplete));
         }
 
         // GET: api/TodoItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
+        public async Task<ActionResult<TodoItemResponseDTO>> GetTodoItem(long id)
         {
             var userId = User.FindFirstValue("id");
             
-            return await _bus.InvokeAsync<TodoItem>(
+            return await _bus.InvokeAsync<TodoItemResponseDTO>(
                 new GetTodoById(id, userId));
         }
 

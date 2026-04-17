@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TodoApi.Errors;
-using TodoApi.Models;
-using TodoApi.Repositories.TodoItems;
+﻿using TodoApi.UOF;
 
 namespace TodoApi.Command.TodoItems
 {
@@ -9,14 +6,15 @@ namespace TodoApi.Command.TodoItems
     public class DeleteTodoHandler
     {
 
-        public readonly IWritableTodoItemRepository _repository;
-        public DeleteTodoHandler(IWritableTodoItemRepository repository)
+        public readonly UnitOfWork _unitOfWork;
+        public DeleteTodoHandler(UnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
         public async Task Handle(DeleteTodo cmd)
         {
-            await _repository.DeleteTodo(cmd.Id, cmd.UserId);
+            await _unitOfWork.TodoItemRepo.DeleteTodo(cmd.Id, cmd.UserId);
+            await _unitOfWork.CompleteAsync();
         }
 
     }

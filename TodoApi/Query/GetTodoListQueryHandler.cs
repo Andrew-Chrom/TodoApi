@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
-using TodoApi.Models.DTO;
-using TodoApi.Repositories;
-using TodoApi.Repositories.TodoItems;
+﻿using TodoApi.Models.DTO;
 using TodoApi.Repositories.TodoLists;
 
 namespace TodoApi.Query

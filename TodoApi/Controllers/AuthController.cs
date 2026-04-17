@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using TodoApi.Command;
 using TodoApi.Command.Authorization;
 using TodoApi.Models;
 using TodoApi.Query;

@@ -2,17 +2,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Configuration;
 using System.Text;
 using TodoApi.Interfaces;
 using TodoApi.Models;
 using TodoApi.Services;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Wolverine;
 using TodoApi.Middleware;
 using TodoApi.Repositories.TodoItems;
 using TodoApi.Repositories.TodoLists;
 using TodoApi.UOF;
+using TodoApi.Repositories.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,13 +74,16 @@ builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();
 builder.Services.AddScoped<IAccessTokenService, AccessTokenService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IRefreshTokenValidator, RefreshTokenValidator>();
-builder.Services.AddScoped<ITokenIssuer, TokenIssuer>();
+builder.Services.AddScoped<ITokenIssuerService, TokenIssuerService>();
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
     provider.GetRequiredService<ApplicationDbContext>());
 builder.Services.AddScoped<IWritableTodoItemRepository, WritableTodoItemRepository>();
 builder.Services.AddScoped<IReadonlyTodoItemRepository, ReadonlyTodoItemRepository>();
 builder.Services.AddScoped<IWritableTodoListRepository, WritableTodoListRepository>();
 builder.Services.AddScoped<IReadonlyTodoListRepository, ReadonlyTodoListRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
 builder.Services.AddScoped<UnitOfWork>();
 var app = builder.Build();
 

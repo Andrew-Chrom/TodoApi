@@ -1,10 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Elfie.Diagnostics;
-using NuGet.Protocol.Core.Types;
-using TodoApi.Models;
-using TodoApi.Models.DTO;
-using TodoApi.Repositories;
-using TodoApi.Repositories.TodoItems;
-using TodoApi.Repositories.TodoLists;
+﻿using TodoApi.Models.DTO;
+using TodoApi.UOF;
 
 namespace TodoApi.Command.TodoList
 {
@@ -12,16 +7,17 @@ namespace TodoApi.Command.TodoList
 
     public class CreateTodoListHandler
     {
-        public readonly IWritableTodoListRepository _repository;
-        public CreateTodoListHandler(IWritableTodoListRepository repository)
+        public readonly UnitOfWork _unitOfWork;
+        public CreateTodoListHandler(UnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
         public async Task<long> Handle(CreateTodoListCommand command)
         {
             var todo = new TodoListCreateDto(command.Title);
 
-            var id = await _repository.CreateTodoList(todo, command.UserId);
+            var id = await _unitOfWork.TodoListRepo.CreateTodoList(todo, command.UserId);
+            await _unitOfWork.CompleteAsync();
 
             return id;
         }

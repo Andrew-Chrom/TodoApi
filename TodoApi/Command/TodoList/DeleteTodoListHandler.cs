@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TodoApi.Errors;
+﻿using TodoApi.Errors;
 using TodoApi.Models;
-using TodoApi.Repositories;
-using TodoApi.Repositories.TodoLists;
+using TodoApi.UOF;
 
 namespace TodoApi.Command.TodoList
 {
@@ -10,14 +8,21 @@ namespace TodoApi.Command.TodoList
     public class DeleteTodoListHandler
     {
 
-        public readonly IWritableTodoListRepository _repository;
-        public DeleteTodoListHandler(IWritableTodoListRepository repository)
+        public readonly UnitOfWork _unitOfWork;
+        public DeleteTodoListHandler(UnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
         public async Task Handle(DeleteTodoListCommand cmd)
         {
-            await _repository.DeleteTodoList(cmd.Id, cmd.UserId);
+            
+            var todoList = await _unitOfWork.TodoListRepo.GetTodoListById(cmd.Id, cmd.UserId);
+
+            if (todoList == null)
+                throw new NotFoundException("Todo not found");
+
+            await _unitOfWork.TodoListRepo.DeleteTodoList(todoList);
+            await _unitOfWork.CompleteAsync();
         }
 
     }

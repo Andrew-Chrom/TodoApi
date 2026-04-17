@@ -41,35 +41,17 @@ namespace TodoApi.Repositories.TodoLists
                 UserId = userId
             };
             _ctx.TodoLists.Add(item);
-            await _ctx.SaveChangesAsync();
             
             return item.Id;
         }
-        public async Task UpdateTodoList(TodoListCreateDto dto, long id, string userId)
+        public async Task UpdateTodoList(TodoList todoList, TodoListCreateDto dto)
         {
-            var todoList = await _ctx.TodoLists.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-
-            if (todoList == null)
-                throw new NotFoundException("Todo not found");
-
             todoList.Title = dto.Title;
             todoList.Updated = DateTime.UtcNow;
-
-            await _ctx.SaveChangesAsync();
         }
-        public async Task DeleteTodoList(long id, string userId)
+        public async Task DeleteTodoList(TodoList todoList)
         {
-            var todoList = await _ctx.TodoLists.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-
-            if (todoList == null)
-                throw new NotFoundException("Todo not found");
-
-            var items = await _ctx.TodoItems.Where(x => x.TodoListId == id).ToListAsync();
-            _logger.LogInformation("Found {Count} items to delete", items.Count);
-            _ctx.TodoItems.RemoveRange(items);
-
             _ctx.TodoLists.Remove(todoList);
-            await _ctx.SaveChangesAsync();
         }
     }
 }

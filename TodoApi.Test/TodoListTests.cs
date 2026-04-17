@@ -184,7 +184,7 @@ namespace TodoApi.TodoApi.Test
 
             await context.SaveChangesAsync();
 
-            var handler = new DeleteTodoListHandler(new WritableTodoListRepository(context, NullLogger<WritableTodoListRepository>.Instance));
+            var handler = new DeleteTodoListHandler(new UnitOfWork(context, NullLogger<WritableTodoListRepository>.Instance));
             await handler.Handle(new DeleteTodoListCommand(1, userId));
 
             var deletedTodoList = await context.TodoLists.FindAsync(1L);
@@ -210,7 +210,7 @@ namespace TodoApi.TodoApi.Test
                 UserId = userId
             });
 
-            cmd_ctx.TodoItems.Add(new TodoItem { Id = 1L, Name = "Read a book", IsComplete = false, UserId = userId });
+            cmd_ctx.TodoItems.Add(new TodoItem { Id = 1L, Name = "Read a book", IsComplete = false, UserId = userId, TodoListId=null });
 
             await cmd_ctx.SaveChangesAsync();
 

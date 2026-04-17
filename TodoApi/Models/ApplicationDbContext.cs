@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Configuration;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using TodoApi.Interfaces;
 
 namespace TodoApi.Models
@@ -45,13 +41,6 @@ namespace TodoApi.Models
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(builder);
         }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseNpgsql(_configuration.GetConnectionString("TodoApiDB"));
-        //    //base.OnConfiguring(optionsBuilder);
-
-        //}
     }
 
 }
