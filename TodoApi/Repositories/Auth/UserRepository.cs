@@ -22,6 +22,7 @@ namespace TodoApi.Repositories.Auth
 
             return user;
         }
+        
         public async Task<User> GetUserByEmailAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -36,5 +37,13 @@ namespace TodoApi.Repositories.Auth
         {
             return await _userManager.CreateAsync(user, password);
         }
+
+        public async Task<IdentityResult> DeleteUserAsync(User user)
+        {
+            return await _userManager.DeleteAsync(user);
+        }
+
+
+
     }
 }

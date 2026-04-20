@@ -9,6 +9,7 @@ namespace TodoApi.Repositories.Auth
         Task<User> GetUserByEmailAsync(string email);
         Task<bool> CheckUserPassword(User user, string password);
         Task<IdentityResult> AddUserAsync(User user, string password);
+        Task<IdentityResult> DeleteUserAsync(User user);
 
     }
 }
