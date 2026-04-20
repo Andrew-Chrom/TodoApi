@@ -11,18 +11,32 @@ using TodoApi.Command;
 using TodoApi.Query;
 using Wolverine;
 
-namespace TodoApi.Repositories
+namespace TodoApi.Repositories.TodoItems
 {
-    public class WritableRepository : IWritableRepository
+    public class WritableTodoItemRepository : IWritableTodoItemRepository
     {
         public readonly CommandDbContext _ctx;
-        public WritableRepository(CommandDbContext ctx)
+        
+        public WritableTodoItemRepository(CommandDbContext ctx)
         {
             _ctx = ctx;
         }
+
+        public async Task<TodoItemResponseDTO> GetTodoById(long id, string userId)
+        {
+            var todoItem = await _ctx.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+
+            return new TodoItemResponseDTO
+            {
+                Id = todoItem.Id,
+                Name = todoItem.Name,
+                IsComplete = todoItem.IsComplete,
+                TodoListId = todoItem.TodoListId,
+            };
+
+        }
         public async Task<long> CreateTodo(TodoItem item)
         {
-            //var todo = new TodoItem(item);
             _ctx.TodoItems.Add(item);
             await _ctx.SaveChangesAsync();
             
@@ -30,6 +44,7 @@ namespace TodoApi.Repositories
         }
         public async Task UpdateTodo(TodoItemCreateDTO dto, long id, string userId)
         {
+
             var todoItem = await _ctx.TodoItems.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
             if (todoItem == null)
@@ -37,10 +52,7 @@ namespace TodoApi.Repositories
 
             todoItem.Name = dto.Name;
             todoItem.IsComplete = dto.IsComplete;
-
-            //_ctx.Entry(todoItem).State = EntityState.Modified;
-
-            await _ctx.SaveChangesAsync();
+            todoItem.TodoListId = dto.TodoListId;
         }
         public async Task DeleteTodo(long id, string userId)
         {
@@ -50,7 +62,6 @@ namespace TodoApi.Repositories
                 throw new NotFoundException("Todo not found");
 
             _ctx.TodoItems.Remove(todoItem);
-            await _ctx.SaveChangesAsync();
         }
     }
 }

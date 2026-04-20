@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Configuration;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using TodoApi.Interfaces;
 
 namespace TodoApi.Models
@@ -39,18 +35,12 @@ namespace TodoApi.Models
 
         public DbSet<TodoItem> TodoItems { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<TodoList> TodoLists { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(builder);
         }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseNpgsql(_configuration.GetConnectionString("TodoApiDB"));
-        //    //base.OnConfiguring(optionsBuilder);
-
-        //}
     }
 
 }

@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
-using TodoApi.Repositories;
+﻿using TodoApi.Models;
+using TodoApi.Models.DTO;
+using TodoApi.Repositories.TodoItems;
 
 namespace TodoApi.Query
 {
@@ -8,13 +8,13 @@ namespace TodoApi.Query
 
     public class GetTodosQueryHandler
     {
-        public readonly IReadonlyRepository _repository;
-        public GetTodosQueryHandler(IReadonlyRepository repository)
+        public readonly IReadonlyTodoItemRepository _repository;
+        public GetTodosQueryHandler(IReadonlyTodoItemRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<List<TodoItem>> Handle(GetTodosQuery query)
+        public async Task<List<TodoItemResponseDTO>> Handle(GetTodosQuery query)
         {
             return await _repository.GetTodos(query.UserId, query.IsComplete);
         }

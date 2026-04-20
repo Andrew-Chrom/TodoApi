@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using TodoApi.Command;
+using TodoApi.Command.TodoItems;
 using TodoApi.Models;
 using TodoApi.Models.DTO;
 using TodoApi.Query;
@@ -11,6 +11,7 @@ namespace TodoApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TodoItemsController : ControllerBase
     {
         private readonly IMessageBus _bus;
@@ -20,29 +21,26 @@ namespace TodoApi.Controllers
         }
 
         // GET: api/TodoItems
-        [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems([FromQuery(Name = "IsCompleted")] bool? IsComplete)
+        public async Task<ActionResult<IEnumerable<TodoItemResponseDTO>>> GetTodoItems([FromQuery(Name = "IsCompleted")] bool? IsComplete)
         {
             var userId = User.FindFirstValue("id");
 
-            return await _bus.InvokeAsync<List<TodoItem>>(
+            return await _bus.InvokeAsync<List<TodoItemResponseDTO>>(
                 new GetTodosQuery(userId, IsComplete));
         }
 
         // GET: api/TodoItems/5
-        [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
+        public async Task<ActionResult<TodoItemResponseDTO>> GetTodoItem(long id)
         {
             var userId = User.FindFirstValue("id");
             
-            return await _bus.InvokeAsync<TodoItem>(
+            return await _bus.InvokeAsync<TodoItemResponseDTO>(
                 new GetTodoById(id, userId));
         }
 
         // POST api/toggle/5
-        [Authorize]
         [HttpPost("toggle/{id}")]
         public async Task<ActionResult<TodoItem>> ToggleItem(long id)
         {
@@ -54,7 +52,6 @@ namespace TodoApi.Controllers
 
         // PUT: api/TodoItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTodoItem(long id, TodoItemCreateDTO dto)
         {
@@ -66,7 +63,6 @@ namespace TodoApi.Controllers
 
         // POST: api/TodoItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [Authorize]
         [HttpPost]
         public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItemCreateDTO dto)
         {
@@ -77,7 +73,6 @@ namespace TodoApi.Controllers
         }
 
         // DELETE: api/TodoItems/5
-        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodoItem(long id)
         {
