@@ -1,4 +1,5 @@
-﻿using TodoApi.Errors;
+﻿using System.Text.Json.Serialization;
+using TodoApi.Errors;
 using TodoApi.Models.DTO;
 using TodoApi.UOF;
 
@@ -6,9 +7,19 @@ namespace TodoApi.Command.TodoList
 {
     public class MoveTodoItemHandler
     {
-        public record MoveTodoItemCommand(string UserId, long TodoListId, long TodoItemId, long DestinationTodoListId);
+        public record MoveTodoItemCommand
+        {
+            [JsonIgnore]
+            public string? UserId { get; set; }
+            [JsonIgnore]
+            public long TodoListId { get; set; }
+            [JsonIgnore]
+            public long DestinationTodoListId { get; set; }
+            public long TodoItemId { get; set; }
 
-        UnitOfWork _unitOfWork;
+        };
+
+        private readonly UnitOfWork _unitOfWork;
         public MoveTodoItemHandler(UnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -49,8 +60,7 @@ namespace TodoApi.Command.TodoList
                 TodoListId = cmd.DestinationTodoListId
             }, todoItem.Id, cmd.UserId);
 
-            todoList.Updated = DateTime.UtcNow;
-            destinationList.Updated = DateTime.UtcNow;
+
 
             await _unitOfWork.CompleteAsync();
         }

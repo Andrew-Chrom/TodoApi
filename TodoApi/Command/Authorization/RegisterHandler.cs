@@ -7,27 +7,21 @@ namespace TodoApi.Command.Authorization
     public record RegisterCommand(string Email, string Password);
     public class RegisterHandler
     {
-        private readonly IUserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
 
-        public RegisterHandler(IUserRepository userRepository)
+        public RegisterHandler(UserManager<User> userManager)
         {
-            _userRepository = userRepository;
+            _userManager = userManager;
         }
         public async Task<IdentityResult> Handle(RegisterCommand cmd)
         {
-            if (await _userRepository.GetUserByEmailAsync(cmd.Email) is not null)
-            {
-                throw new Exception("User with this email exists");
-            }
-
             var user = new User(cmd.Email)
             {
                 UserName = cmd.Email,
                 Email = cmd.Email
             };
 
-            return await _userRepository.AddUserAsync(user, cmd.Password);
-            
+            return await _userManager.CreateAsync(user, cmd.Password);  
         }
 
     }

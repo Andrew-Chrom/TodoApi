@@ -1,4 +1,5 @@
-﻿using TodoApi.Errors;
+﻿using System.Text.Json.Serialization;
+using TodoApi.Errors;
 using TodoApi.Models;
 using TodoApi.Models.DTO;
 using TodoApi.UOF;
@@ -7,7 +8,14 @@ using Wolverine.Persistence;
 namespace TodoApi.Command.TodoList
 {
 
-    public record UpdateTodoCommand(long Id, string Title, string UserId);
+    public record UpdateTodoCommand
+    {
+        public string Title { get; set; }
+        [JsonIgnore]
+        public long Id { get; set; }
+        [JsonIgnore]
+        public string? UserId { get; set; }
+    };
     public class UpdateTodoListHandler
     {
         public readonly UnitOfWork _unitOfWork;

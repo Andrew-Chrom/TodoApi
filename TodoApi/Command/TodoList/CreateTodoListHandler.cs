@@ -1,9 +1,15 @@
-﻿using TodoApi.Models.DTO;
+﻿using System.Text.Json.Serialization;
+using TodoApi.Models.DTO;
 using TodoApi.UOF;
 
 namespace TodoApi.Command.TodoList
 {
-    public record CreateTodoListCommand(string Title, string UserId);
+    public record CreateTodoListCommand
+    {
+        public string Title { get; set; }
+        [JsonIgnore]
+        public string? UserId { get; set; }
+    };
 
     public class CreateTodoListHandler
     {

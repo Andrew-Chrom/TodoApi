@@ -10,8 +10,6 @@ namespace TodoApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-
-
 public class AuthController : Controller
 {
     private readonly IMessageBus _bus;

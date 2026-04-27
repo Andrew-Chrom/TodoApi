@@ -48,7 +48,6 @@ namespace TodoApi.Command.TodoList
             {
                 list.OpenItemsCount -= 1;
             }
-            list.Updated = DateTime.UtcNow;
 
             await _unitOfWork.CompleteAsync();
         }

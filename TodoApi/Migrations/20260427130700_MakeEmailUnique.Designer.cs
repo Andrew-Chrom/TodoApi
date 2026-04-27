@@ -7,14 +7,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TodoApi.Context;
 
-
 #nullable disable
 
 namespace TodoApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260408103748_Add TodoList Entity In TodoItem")]
-    partial class AddTodoListEntityInTodoItem
+    [Migration("20260427130700_MakeEmailUnique")]
+    partial class MakeEmailUnique
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,6 +175,8 @@ namespace TodoApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("RefreshTokens");
                 });
 
@@ -203,6 +204,8 @@ namespace TodoApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("TodoListId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TodoItems");
                 });
@@ -233,9 +236,12 @@ namespace TodoApi.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TodoLists");
                 });
@@ -248,12 +254,6 @@ namespace TodoApi.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
-                    b.Property<double?>("Compensation")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -263,12 +263,6 @@ namespace TodoApi.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("Employed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsMarried")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("LockoutEnabled")
@@ -294,9 +288,6 @@ namespace TodoApi.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Pin")
-                        .HasColumnType("text");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -310,6 +301,7 @@ namespace TodoApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
+                        .IsUnique()
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
@@ -370,18 +362,53 @@ namespace TodoApi.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TodoApi.Models.RefreshToken", b =>
+                {
+                    b.HasOne("TodoApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TodoApi.Models.TodoItem", b =>
                 {
                     b.HasOne("TodoApi.Models.TodoList", "TodoList")
                         .WithMany("Items")
                         .HasForeignKey("TodoListId");
 
+                    b.HasOne("TodoApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("TodoList");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TodoApi.Models.TodoList", b =>
+                {
+                    b.HasOne("TodoApi.Models.User", "User")
+                        .WithMany("TodoLists")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TodoApi.Models.TodoList", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("TodoApi.Models.User", b =>
+                {
+                    b.Navigation("TodoLists");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TodoApi.Context;
 using TodoApi.Models;
 
 namespace TodoApi.Repositories.Auth

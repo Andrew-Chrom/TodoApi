@@ -12,6 +12,7 @@ using TodoApi.Repositories.TodoItems;
 using TodoApi.Repositories.TodoLists;
 using TodoApi.UOF;
 using TodoApi.Repositories.Auth;
+using TodoApi.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,20 +34,21 @@ builder.Services.AddSwaggerGen();
 builder.Host.UseWolverine();
 
 builder.Services
-.AddOptions<JwtSettings>()
-.Bind(builder.Configuration.GetSection("JwtSettings"))
-.ValidateDataAnnotations()
-.Validate(s => s.AccessTokenSecret.Length >= 32, "AccessTokenSecret must be at least 32 characters long")
-.Validate(s => s.RefreshTokenSecret.Length >= 32, "RefreshTokenSecret must be at least 32 characters long")
-.ValidateOnStart();
+    .AddOptions<JwtSettings>()
+    .Bind(builder.Configuration.GetSection("JwtSettings"))
+    .ValidateDataAnnotations()
+    .Validate(s => s.AccessTokenSecret.Length >= 32, "AccessTokenSecret must be at least 32 characters long")
+    .Validate(s => s.   RefreshTokenSecret.Length >= 32, "RefreshTokenSecret must be at least 32 characters long")
+    .ValidateOnStart();
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options => {
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 8;
+    options.User.RequireUniqueEmail = true;
 })
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(x =>
 {
@@ -81,7 +83,6 @@ builder.Services.AddScoped<IWritableTodoItemRepository, WritableTodoItemReposito
 builder.Services.AddScoped<IReadonlyTodoItemRepository, ReadonlyTodoItemRepository>();
 builder.Services.AddScoped<IWritableTodoListRepository, WritableTodoListRepository>();
 builder.Services.AddScoped<IReadonlyTodoListRepository, ReadonlyTodoListRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 builder.Services.AddScoped<UnitOfWork>();

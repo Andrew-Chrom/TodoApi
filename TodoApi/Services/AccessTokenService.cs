@@ -17,7 +17,7 @@ namespace TodoApi.Services
         {
             List<Claim> claims = new()
         {
-            new Claim("id", user.Id),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, user.UserName),
         };
