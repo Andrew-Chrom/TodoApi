@@ -1,4 +1,5 @@
-﻿using TodoApi.Models.DTO;
+﻿using TodoApi.Errors;
+using TodoApi.Models.DTO;
 using TodoApi.Repositories.TodoItems;
 using TodoApi.UOF;
 
@@ -27,7 +28,7 @@ namespace TodoApi.Command.TodoList
             
             if(todoItem.TodoListId == null)
             {
-                throw new Exception($"Todo item with id {command.TodoItemId} is not associated with any list.");
+                throw new NotFoundException($"Todo item with id {command.TodoItemId} is not associated with any list.");
             }
             await _unitOfWork.TodoItemRepo.UpdateTodo(new TodoItemCreateDTO
             {

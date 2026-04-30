@@ -17,7 +17,7 @@ namespace TodoApi.Command.TodoItems
             var todo = await _unitOfWork.TodoItemRepo.GetTodoById(command.Id, command.UserId);
 
             if (todo == null)
-                throw new NotFoundException("Todo not found");
+                throw new NotFoundException("TodoItem not found");
             await _unitOfWork.TodoItemRepo.UpdateTodo(new TodoItemCreateDTO
             {
                 Name = todo.Name,

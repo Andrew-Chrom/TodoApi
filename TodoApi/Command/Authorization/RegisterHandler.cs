@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using TodoApi.Errors;
 using TodoApi.Models;
 using TodoApi.Repositories.Auth;
 
@@ -15,6 +16,11 @@ namespace TodoApi.Command.Authorization
         }
         public async Task<IdentityResult> Handle(RegisterCommand cmd)
         {
+            if (await _userManager.FindByEmailAsync(cmd.Email) != null)
+            {
+                throw new ConflictException("Email already in use.");
+            }
+
             var user = new User(cmd.Email)
             {
                 UserName = cmd.Email,

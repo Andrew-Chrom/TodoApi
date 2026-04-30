@@ -19,7 +19,7 @@ namespace TodoApi.Repositories.TodoItems
                 Id = todo.Id,
                 Name = todo.Name,
                 IsComplete = todo.IsComplete,
-                TodoListId = todo.Id,
+                TodoListId = todo.TodoListId,
                 UserId = todo.UserId
             })
                 .Where(x => x.UserId == userId);

@@ -52,7 +52,7 @@ namespace TodoApi.Controllers
             cmd.UserId = UserId;
             await _bus.InvokeAsync(cmd);
 
-            return NoContent();
+            return CreatedAtAction(nameof(GetTodoItem), new { id = id }, null);
         }
 
         // POST: api/TodoItems
@@ -61,9 +61,9 @@ namespace TodoApi.Controllers
         public async Task<ActionResult<TodoItem>> PostTodoItem([FromBody] CreateTodoCommand cmd)
         {
             cmd.UserId = UserId;
-            await _bus.InvokeAsync(cmd);
+            var id = await _bus.InvokeAsync<long>(cmd);
 
-            return NoContent();
+            return CreatedAtAction(nameof(GetTodoItem), new { id = id }, null);
         }
 
         // DELETE: api/TodoItems/5

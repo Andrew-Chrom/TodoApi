@@ -33,7 +33,6 @@ namespace TodoApi.Repositories.TodoItems
         public async Task<long> CreateTodo(TodoItem item)
         {
             _ctx.TodoItems.Add(item);
-            await _ctx.SaveChangesAsync();
             
             return item.Id;
         }

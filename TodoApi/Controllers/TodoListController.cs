@@ -37,9 +37,9 @@ namespace TodoApi.Controllers
         public async Task<IActionResult> CreateTodoList([FromBody] CreateTodoListCommand cmd)
         { 
             cmd.UserId = UserId;
-            await _bus.InvokeAsync<long>(cmd);
+            var id = await _bus.InvokeAsync<long>(cmd);
             
-            return NoContent();
+            return CreatedAtAction(nameof(GetTodoListById), new { id = id }, null);
         }
 
         [HttpPut("{id:long}")]
@@ -49,7 +49,7 @@ namespace TodoApi.Controllers
             cmd.UserId = UserId;
             await _bus.InvokeAsync(cmd);
 
-            return NoContent();
+            return CreatedAtAction(nameof(GetTodoListById), new { id = id }, null);
         }
 
         [HttpDelete("{id:long}")]
