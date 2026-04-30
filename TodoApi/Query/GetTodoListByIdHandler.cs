@@ -17,7 +17,7 @@ namespace TodoApi.Query
         {
             var todoList = await _repository.GetTodoListById(query.Id, query.UserId);
             if (todoList == null)
-                throw new NotFoundException("Todo not found");
+                throw new NotFoundException("TodoList not found");
 
             return todoList;
         }

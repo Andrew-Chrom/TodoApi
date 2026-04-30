@@ -1,6 +1,7 @@
-﻿using Mono.TextTemplating;
-using TodoApi.Interfaces;
+﻿using TodoApi.Interfaces;
 using TodoApi.Models;
+using TodoApi.Repositories.Auth;
+using TodoApi.UOF;
 
 namespace TodoApi.Services
 {
@@ -8,19 +9,25 @@ namespace TodoApi.Services
     {
         private readonly IAccessTokenService _accessTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
-        private readonly IApplicationDbContext _context;
-        public TokenIssuerService(IAccessTokenService accessTokenService, IRefreshTokenService refreshTokenService, IApplicationDbContext context)
+        private readonly UnitOfWork _unitOfWork;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        public TokenIssuerService(IAccessTokenService accessTokenService, 
+            IRefreshTokenService refreshTokenService, 
+            UnitOfWork unitOfWork,
+            IRefreshTokenRepository refreshTokenRepository)
         {
             _accessTokenService = accessTokenService;
             _refreshTokenService = refreshTokenService;
-            _context = context;
+            _unitOfWork = unitOfWork;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public async Task<AuthenticateResponse> IssueTokensAsync(User user, CancellationToken cancellationToken)
         {
             var refreshToken = _refreshTokenService.Generate(user);
-            await _context.RefreshTokens.AddAsync(new RefreshToken(user.Id, refreshToken), cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await _refreshTokenRepository.AddAsync(new RefreshToken(user.Id, refreshToken));
+            await _unitOfWork.CompleteAsync();
+
             return new AuthenticateResponse
             {       
                 AccessToken = _accessTokenService.Generate(user),

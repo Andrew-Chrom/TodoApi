@@ -1,4 +1,5 @@
-﻿using TodoApi.Errors;
+﻿using Microsoft.AspNetCore.Identity;
+using TodoApi.Errors;
 using TodoApi.Interfaces;
 using TodoApi.Models;
 using TodoApi.Repositories.Auth;
@@ -9,22 +10,22 @@ namespace TodoApi.Query
 
     public class LoginHandler
     {
-        private readonly IUserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
         private readonly ITokenIssuerService _authService;
 
-        public LoginHandler(IUserRepository userRepository, ITokenIssuerService authService)
+        public LoginHandler(UserManager<User> userManager, ITokenIssuerService authService)
         {
-            _userRepository = userRepository;
+            _userManager = userManager;
             _authService = authService;
         }
         public async Task<AuthenticateResponse> Handle(LoginQuery query)
         {
-            var user = await _userRepository.GetUserByEmailAsync(query.Email);
+            var user = await _userManager.FindByEmailAsync(query.Email);
 
             if (user == null)
                 throw new UnathorizedException("");
 
-            if (await _userRepository.CheckUserPassword(user, query.Password))
+            if (await _userManager.CheckPasswordAsync(user, query.Password))
                 return await _authService.IssueTokensAsync(user, default);
             else
                 throw new UnathorizedException("");

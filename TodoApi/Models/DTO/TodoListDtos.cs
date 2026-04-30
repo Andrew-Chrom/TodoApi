@@ -23,9 +23,4 @@
         public long CompletedItemsCount { get; set; }
     }
 
-    public record MoveTodoItemDto
-    {
-        public long TodoItemId { get; set; }
-    }
-
 }

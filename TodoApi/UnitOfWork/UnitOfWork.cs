@@ -1,4 +1,5 @@
-﻿using TodoApi.Models;
+﻿using TodoApi.Context;
+using TodoApi.Repositories.Auth;
 using TodoApi.Repositories.TodoItems;
 using TodoApi.Repositories.TodoLists;
 
@@ -10,11 +11,16 @@ namespace TodoApi.UOF
             private bool _disposed = false;
             public IWritableTodoItemRepository TodoItemRepo;
             public IWritableTodoListRepository TodoListRepo;
-            public UnitOfWork(CommandDbContext context, ILogger<WritableTodoListRepository> _logger)
+            public IRefreshTokenRepository RefreshTokenRepo;
+            public UnitOfWork(CommandDbContext context,
+                IWritableTodoItemRepository TodoItemRepo,
+                IWritableTodoListRepository TodoListRepo,
+                IRefreshTokenRepository RefreshTokenRepo)
             {
                 _context = context;
-                TodoItemRepo = new WritableTodoItemRepository(_context);
-                TodoListRepo = new WritableTodoListRepository(_context, _logger);
+                this.TodoItemRepo = TodoItemRepo;
+                this.TodoListRepo = TodoListRepo;
+                this.RefreshTokenRepo = RefreshTokenRepo;
             }
 
             public async Task<int> CompleteAsync()

@@ -2,8 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using TodoApi.Interfaces;
+using TodoApi.Models;
 
-namespace TodoApi.Models
+namespace TodoApi.Context
 {
 
     
@@ -11,6 +12,8 @@ namespace TodoApi.Models
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {}
+
+        protected ApplicationDbContext(DbContextOptions options) : base(options) { }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
@@ -20,12 +23,12 @@ namespace TodoApi.Models
                 {
                     case EntityState.Added:
                         entry.Entity.CreatedBy = "API";
-                        entry.Entity.Created = DateTime.Now;
-                        entry.Entity.LastModified = DateTime.Now;
+                        entry.Entity.Created = DateTime.UtcNow;
+                        entry.Entity.LastModified = DateTime.UtcNow;
                         entry.Entity.LastModifiedBy = "API";
                         break;
                     case EntityState.Modified:
-                        entry.Entity.LastModified = DateTime.Now;
+                        entry.Entity.LastModified = DateTime.UtcNow;
                         entry.Entity.LastModifiedBy = "API";
                         break;
                 }
@@ -40,6 +43,11 @@ namespace TodoApi.Models
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(builder);
+
+            builder.Entity<User>()
+                .HasIndex(u => u.NormalizedEmail)
+                .HasDatabaseName("EmailIndex")
+                .IsUnique();
         }
     }
 

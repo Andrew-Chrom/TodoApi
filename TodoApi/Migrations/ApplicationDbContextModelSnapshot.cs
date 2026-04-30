@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TodoApi.Models;
+using TodoApi.Context;
 
 #nullable disable
 
@@ -172,6 +172,8 @@ namespace TodoApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("RefreshTokens");
                 });
 
@@ -183,8 +185,20 @@ namespace TodoApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsComplete")
                         .HasColumnType("boolean");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -199,6 +213,8 @@ namespace TodoApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("TodoListId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("TodoItems");
                 });
@@ -217,15 +233,21 @@ namespace TodoApi.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
                     b.Property<long>("OpenItemsCount")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -247,12 +269,6 @@ namespace TodoApi.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
-                    b.Property<double?>("Compensation")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -262,12 +278,6 @@ namespace TodoApi.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("Employed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsMarried")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("LockoutEnabled")
@@ -293,9 +303,6 @@ namespace TodoApi.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Pin")
-                        .HasColumnType("text");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -309,6 +316,7 @@ namespace TodoApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
+                        .IsUnique()
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
@@ -369,13 +377,32 @@ namespace TodoApi.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TodoApi.Models.RefreshToken", b =>
+                {
+                    b.HasOne("TodoApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TodoApi.Models.TodoItem", b =>
                 {
                     b.HasOne("TodoApi.Models.TodoList", "TodoList")
                         .WithMany("Items")
                         .HasForeignKey("TodoListId");
 
+                    b.HasOne("TodoApi.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("TodoList");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TodoApi.Models.TodoList", b =>

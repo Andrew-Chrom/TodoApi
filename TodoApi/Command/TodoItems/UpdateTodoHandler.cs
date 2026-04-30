@@ -1,9 +1,18 @@
-﻿using TodoApi.Models.DTO;
+﻿using System.Text.Json.Serialization;
+using TodoApi.Models.DTO;
 using TodoApi.UOF;
 
 namespace TodoApi.Command.TodoItems
 {
-    public record UpdateTodoCommand(long Id, string UserId, string Name, bool IsComplete);
+    public record UpdateTodoCommand 
+    {
+        [JsonIgnore]
+        public  long Id { get; set; }
+        [JsonIgnore]
+        public string? UserId { get; set; }
+        public string Name {  get; set; }
+        public bool IsComplete { get; set; }
+    };
     public class UpdateTodoHandler
     {
         public readonly UnitOfWork _unitOfWork;
